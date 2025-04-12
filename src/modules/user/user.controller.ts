@@ -243,11 +243,11 @@ export async function changePasswordHandler(
 
 //* Delete User Handler
 export async function deleteUserHandler(
-  req: FastifyRequest,
+  req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply
 ) {
   try {
-    const { id }: { id: string } = req.params as any;
+    const { id } = req.params;
 
     const user = await findUserById(id);
 
@@ -256,7 +256,14 @@ export async function deleteUserHandler(
         .code(404)
         .send({ success: false, message: "User not found." });
 
+    if (user.role === "STUDENT")
+      return reply.code(403).send({
+        success: false,
+        message: "Students cannot be deleted.",
+      });
+
     await deleteUser(id);
+
     return reply.send({
       success: true,
       message: `User with ID ${id} deleted successfully.`,

@@ -6,10 +6,11 @@ import {
   loginResponse,
   loginLecturer,
   changePassword,
-  changePasswordResponse,
+  otherResponse,
 } from "./user.schema";
 import {
   changePasswordHandler,
+  deleteUserHandler,
   loginHandler,
   loginStudentHandler,
   regAdminHandler,
@@ -63,7 +64,7 @@ export default async function userRoutes(server: FastifyInstance) {
           201: createUserResponse,
         },
       },
-      preHandler: [server.authorize(["ADMIN"])],
+      preHandler: [server.authenticate, server.authorize(["ADMIN"])],
     },
 
     {
@@ -77,8 +78,6 @@ export default async function userRoutes(server: FastifyInstance) {
         },
       },
     },
-
-    //TODO: DELETE ROUTES TO DELETE LECTURER
   ];
 
   const adminRoutes: RouteConfig[] = [
@@ -92,7 +91,7 @@ export default async function userRoutes(server: FastifyInstance) {
           201: createUserResponse,
         },
       },
-      preHandler: [server.authorize(["ADMIN"])],
+      preHandler: [server.authenticate, server.authorize(["ADMIN"])],
     },
 
     {
@@ -106,8 +105,6 @@ export default async function userRoutes(server: FastifyInstance) {
         },
       },
     },
-
-    //TODO: DELETE ROUTES TO DELETE ADMIN
   ];
 
   const changePasswordRoutes: RouteConfig[] = [
@@ -118,9 +115,23 @@ export default async function userRoutes(server: FastifyInstance) {
       schema: {
         body: changePassword,
         response: {
-          201: changePasswordResponse,
+          201: otherResponse,
         },
       },
+    },
+  ];
+
+  const deleteUserRoutes: RouteConfig[] = [
+    {
+      method: "delete",
+      url: "/users/:id",
+      handler: deleteUserHandler,
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
+      preHandler: [server.authenticate, server.authorize(["ADMIN"])],
     },
   ];
 
@@ -128,6 +139,8 @@ export default async function userRoutes(server: FastifyInstance) {
     ...studentRoutes,
     ...lecturerRoutes,
     ...adminRoutes,
+    ...changePasswordRoutes,
+    ...deleteUserRoutes,
   ];
 
   allUserRoutes.forEach((route) => {

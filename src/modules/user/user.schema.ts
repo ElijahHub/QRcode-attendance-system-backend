@@ -81,10 +81,10 @@ export const changePassword = zodToJsonSchema(
   "ChangePassword"
 );
 
-export const changePasswordResponse = zodToJsonSchema(
+export const otherResponse = zodToJsonSchema(
   z.object({
     success: z.boolean(),
     message: z.string(),
   }),
-  "ChangePasswordResponse"
+  "otherResponse"
 );
