@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id String @id  @default(uuid())
+  email String @unique
+  matNumber String? @unique
+  name String
+  password String
+  role Role @default(STUDENT)
+  mustChangePassword Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  //relations
+  lectureSession LectureSessions[]
+  attendance AttendanceRecords[]
+  courses Course[] @relation("CourseLecturers")
+
+}
+
+model Course {
+  id String @id @default(uuid())
+  courseCode String @unique 
+  courseName String @unique
+  description String? @db.VarChar(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //relations
+  lecturers User[] @relation("CourseLecturers")
+  lectureCourse LectureSessions[]
+}
+
+model LectureSessions {
+  id String @id @default(uuid())
+  courseId String 
+  lecturerId String 
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  geolocationData String
+
+  //relations
+  lecturer User @relation(fields: [lecturerId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+  attendance AttendanceRecords[]
+}
+
+model AttendanceRecords {
+  id String @id @default(uuid())
+  sessionId String 
+  studentId String 
+  timestamp DateTime @default(now())
+  overrideFlag String?
+
+  //relations
+  lecture LectureSessions @relation(fields: [sessionId], references: [id])
+  student User @relation(fields: [studentId], references: [id])
+  @@unique([studentId, sessionId])
+}
+
+
+enum Role {
+  STUDENT
+  LECTURER
+  ADMIN
+}
