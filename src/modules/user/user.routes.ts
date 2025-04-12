@@ -118,6 +118,10 @@ export default async function userRoutes(server: FastifyInstance) {
           201: otherResponse,
         },
       },
+      preHandler: [
+        server.authenticate,
+        server.authorize(["ADMIN", "LECTURER"]),
+      ],
     },
   ];
 

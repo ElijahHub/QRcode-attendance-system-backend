@@ -29,6 +29,7 @@
     "fastify": "^5.2.2",
     "fastify-type-provider-zod": "^4.0.2",
     "lodash": "^4.17.21",
+    "nodemailer": "^6.10.0",
     "zod": "^3.24.2",
     "zod-to-json-schema": "^3.24.5"
   }
