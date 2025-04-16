@@ -10,6 +10,7 @@ import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { CORS_ORIGIN, privateKeyPath, publicKeyPath } from "../config";
 
 import userRoutes from "../modules/user/user.routes";
+import coursesRoutes from "../modules/course/course.routes";
 
 export default function server() {
   const app = fastify({
@@ -86,6 +87,7 @@ export default function server() {
   });
 
   app.register(userRoutes, { prefix: "api/v1/user" });
+  app.register(coursesRoutes, { prefix: "api/v1/courses" });
 
   return app;
 }

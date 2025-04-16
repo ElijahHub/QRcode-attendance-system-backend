@@ -1,5 +1,5 @@
 import prisma from "../../utils/prisma";
-import { CreateCourseInput } from "./course.schema";
+import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 
 export async function createCourse(input: CreateCourseInput) {
   return await prisma.course.create({
@@ -15,9 +15,27 @@ export async function createCourse(input: CreateCourseInput) {
   });
 }
 
+export async function updateCourseDetails(
+  courseId: string,
+  input: UpdateCourseDetails
+) {
+  return await prisma.course.update({
+    where: { id: courseId },
+    data: {
+      ...input,
+    },
+  });
+}
+
+export async function findCourseById(courseId: string) {
+  return await prisma.course.findUnique({
+    where: { id: courseId },
+  });
+}
+
 export async function addLecturerToCourse(
-  lecturerIds: string[],
-  courseId: string
+  courseId: string,
+  lecturerIds: string[]
 ) {
   return await prisma.course.update({
     where: { id: courseId },
@@ -33,8 +51,8 @@ export async function addLecturerToCourse(
 }
 
 export async function deleteLecturerFromCourse(
-  lecturerId: string,
-  courseId: string
+  courseId: string,
+  lecturerId: string
 ) {
   return await prisma.course.update({
     where: { id: courseId },
