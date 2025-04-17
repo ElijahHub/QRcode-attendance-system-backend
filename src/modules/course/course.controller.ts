@@ -5,6 +5,7 @@ import {
   createCourse,
   deleteCourse,
   deleteLecturerFromCourse,
+  findCourseByCourseCode,
   findCourseById,
   updateCourseDetails,
 } from "./course.service";
@@ -18,7 +19,13 @@ export async function createCourseHandler(
   try {
     const course = await createCourse(req.body);
 
+    const exist = await findCourseByCourseCode(course.courseCode);
+
     //TODO: check if course already exist using unique corse code
+    if (exist)
+      return reply.code(409).send({
+        message: "A course with this course code already exist",
+      });
 
     return reply.code(201).send({ success: true, data: course });
   } catch (error) {

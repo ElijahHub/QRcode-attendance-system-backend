@@ -38,6 +38,12 @@ export async function findCourseById(courseId: string) {
   });
 }
 
+export async function findCourseByCourseCode(courseCode: string) {
+  return await prisma.course.findUnique({
+    where: { courseCode },
+  });
+}
+
 export async function addLecturerToCourse(
   courseId: string,
   lecturerIds: string[]
