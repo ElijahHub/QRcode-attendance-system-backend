@@ -1,9 +1,9 @@
 import prisma from "../../utils/prisma";
-import { genHash } from "../../utils/auth";
+import { genHash, structureName } from "../../utils/auth";
 import { CreateUserInput, ChangePasswordInput } from "./user.schema";
 
 export async function createUser(input: CreateUserInput) {
-  const { password, confirmPassword, ...rest } = input;
+  const { password, confirmPassword, matNumber, email, name } = input;
 
   if (password !== confirmPassword) throw new Error("Passwords do not match");
 
@@ -11,7 +11,9 @@ export async function createUser(input: CreateUserInput) {
 
   const user = await prisma.user.create({
     data: {
-      ...rest,
+      name: structureName(name),
+      matNumber: matNumber?.toUpperCase(),
+      email: email.toLowerCase(),
       password: hashedPassword,
     },
   });
@@ -39,7 +41,7 @@ export async function changePassword(input: ChangePasswordInput) {
 export async function findUserByMatNumber(matNumber: string) {
   return await prisma.user.findUnique({
     where: {
-      matNumber,
+      matNumber: matNumber.toUpperCase(),
     },
   });
 }
@@ -47,7 +49,7 @@ export async function findUserByMatNumber(matNumber: string) {
 export async function findUserEmail(email: string) {
   return await prisma.user.findUnique({
     where: {
-      email,
+      email: email.toLowerCase(),
     },
   });
 }
