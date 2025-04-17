@@ -1,4 +1,4 @@
-import { string, z } from "zod";
+import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
 const courseCore = {
@@ -13,9 +13,12 @@ const createCourseSchema = z.object({
 });
 
 const createCourseResponseSchema = z.object({
-  id: z.string(),
-  ...courseCore,
-  lecturerIds: z.array(z.string()),
+  success: z.boolean(),
+  data: z.object({
+    id: z.string(),
+    ...courseCore,
+    lecturerIds: z.array(z.string()),
+  }),
 });
 
 const updateCourseDetailsSchema = z.object({

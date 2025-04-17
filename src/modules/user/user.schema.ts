@@ -21,8 +21,11 @@ const createUserSchema = z
   });
 
 const createUserResponseSchema = z.object({
-  id: z.string(),
-  ...userCore,
+  success: z.boolean(),
+  data: z.object({
+    id: z.string(),
+    ...userCore,
+  }),
 });
 
 const loginSchemaStudent = z.object({
@@ -36,7 +39,10 @@ const loginSchemaLecturer = z.object({
 });
 
 const loginResponseSchema = z.object({
-  accessToken: z.string(),
+  success: z.boolean(),
+  data: z.object({
+    accessToken: z.string(),
+  }),
 });
 
 const changePasswordSchema = z

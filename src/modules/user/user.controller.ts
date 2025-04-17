@@ -91,10 +91,12 @@ export async function regStudentHandler(
     }
 
     const user = await createUser({ ...body, mustChangePassword: false });
-    return reply.code(201).send(user);
+    return reply.code(201).send({ success: true, data: user });
   } catch (error) {
     console.error(error);
-    return reply.code(500).send(error);
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -119,13 +121,16 @@ export async function loginStudentHandler(
       return reply.code(401).send({ message: "Invalid matNumber or password" });
 
     return reply.code(200).send({
-      accessToken,
+      success: true,
+      data: {
+        accessToken,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
     return reply
       .code(500)
-      .send({ message: "Something went wrong, please try again." });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -152,10 +157,12 @@ export async function regLecturerHandler(
       confirmPassword: "000000",
       role: "LECTURER",
     });
-    return reply.code(201).send(user);
+    return reply.code(201).send({ success: true, data: user });
   } catch (error) {
     console.error(error);
-    return reply.code(500).send(error);
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -183,10 +190,12 @@ export async function regAdminHandler(
       role: "ADMIN",
     });
 
-    return reply.code(201).send(user);
+    return reply.code(201).send({ success: true, data: user });
   } catch (error) {
     console.error(error);
-    return reply.code(500).send(error);
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -208,16 +217,21 @@ export async function loginHandler(
     });
 
     if (!accessToken)
-      return reply.code(401).send({ message: "Invalid email or password" });
+      return reply
+        .code(401)
+        .send({ success: false, message: "Invalid email or password" });
 
     return reply.code(200).send({
-      accessToken,
+      success: true,
+      data: {
+        accessToken,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
     return reply
       .code(500)
-      .send({ message: "Something went wrong, please try again." });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 

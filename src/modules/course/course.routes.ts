@@ -7,8 +7,11 @@ import {
   deleteLecturerFromCourseHandler,
   updateCourseDetailsHandler,
 } from "./course.controller";
-import { createCourse } from "./course.service";
-import { createCourseResponse, updateCourseDetails } from "./course.schema";
+import {
+  createCourseResponse,
+  updateCourseDetails,
+  createCourse,
+} from "./course.schema";
 
 export default async function coursesRoutes(server: FastifyInstance) {
   //TODO: add prehandler to necessary routes and update schemas
