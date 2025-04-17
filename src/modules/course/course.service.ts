@@ -2,9 +2,12 @@ import prisma from "../../utils/prisma";
 import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 
 export async function createCourse(input: CreateCourseInput) {
+  const { courseCode, ...rest } = input;
+
   return await prisma.course.create({
     data: {
-      ...input,
+      courseCode: courseCode.toUpperCase(),
+      ...rest,
       lecturers: {
         connect: input.lecturerIds.map((id) => ({ id })),
       },
@@ -19,10 +22,12 @@ export async function updateCourseDetails(
   courseId: string,
   input: UpdateCourseDetails
 ) {
+  const { courseCode, ...rest } = input;
   return await prisma.course.update({
     where: { id: courseId },
     data: {
-      ...input,
+      courseCode: courseCode.toUpperCase(),
+      ...rest,
     },
   });
 }

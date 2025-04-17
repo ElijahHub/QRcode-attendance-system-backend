@@ -3,7 +3,7 @@ import { genHash, structureName } from "../../utils/auth";
 import { CreateUserInput, ChangePasswordInput } from "./user.schema";
 
 export async function createUser(input: CreateUserInput) {
-  const { password, confirmPassword, matNumber, email, name } = input;
+  const { password, confirmPassword, matNumber, email, name, ...rest } = input;
 
   if (password !== confirmPassword) throw new Error("Passwords do not match");
 
@@ -15,6 +15,7 @@ export async function createUser(input: CreateUserInput) {
       matNumber: matNumber?.toUpperCase(),
       email: email.toLowerCase(),
       password: hashedPassword,
+      ...rest,
     },
   });
 

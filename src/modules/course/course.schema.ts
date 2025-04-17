@@ -37,5 +37,5 @@ export const createCourseResponse = zodToJsonSchema(
 
 export const updateCourseDetails = zodToJsonSchema(
   updateCourseDetailsSchema,
-  "UpdateCourseDetials"
+  "UpdateCourseDetails"
 );

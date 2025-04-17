@@ -14,7 +14,7 @@ import {
 } from "./course.schema";
 
 export default async function coursesRoutes(server: FastifyInstance) {
-  //TODO: add prehandler to necessary routes and update schemas
+  //TODO: add pre handler to necessary routes and update schemas
   const courseRoutes: RouteConfig[] = [
     {
       method: "post",
