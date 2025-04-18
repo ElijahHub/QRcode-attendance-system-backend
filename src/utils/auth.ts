@@ -33,10 +33,3 @@ export function requireAdmin(roles: Array<"ADMIN" | "STUDENT" | "LECTURER">) {
     }
   };
 }
-
-export function structureName(name: string) {
-  return name
-    .split(" ")
-    .map((t, i) => t[0].toUpperCase() + t.slice(1))
-    .join(" ");
-}

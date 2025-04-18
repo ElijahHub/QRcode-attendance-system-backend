@@ -1,5 +1,6 @@
 import prisma from "../../utils/prisma";
-import { genHash, structureName } from "../../utils/auth";
+import { genHash } from "../../utils/auth";
+import { structureName } from "../../utils";
 import { CreateUserInput, ChangePasswordInput } from "./user.schema";
 
 export async function createUser(input: CreateUserInput) {
