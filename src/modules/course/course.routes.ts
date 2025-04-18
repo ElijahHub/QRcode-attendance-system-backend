@@ -47,7 +47,7 @@ export default async function coursesRoutes(server: FastifyInstance) {
       handler: addLecturerToCourseHandler,
       schema: {
         response: {
-          201: otherResponse,
+          201: updateCourseDetails,
         },
       },
     },
@@ -58,7 +58,7 @@ export default async function coursesRoutes(server: FastifyInstance) {
       handler: deleteLecturerFromCourseHandler,
       schema: {
         response: {
-          201: otherResponse,
+          201: updateCourseDetails,
         },
       },
     },

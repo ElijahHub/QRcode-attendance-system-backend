@@ -31,7 +31,7 @@ export async function createCourseHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Failed to create course" });
+      .send({ success: false, message: "Failed to create course", error });
   }
 }
 
@@ -58,7 +58,9 @@ export async function updateCourseDetailsHandler(
 
     return reply.send({ success: true, data: updated });
   } catch (error) {
-    return reply.code(500).send({ success: false, message: "Update failed" });
+    return reply
+      .code(500)
+      .send({ success: false, message: "Update failed", error });
   }
 }
 
@@ -81,13 +83,15 @@ export async function addLecturerToCourseHandler(
         .code(404)
         .send({ success: false, message: "Course not found." });
 
+    //TODO: check if lecturer already exist on the course lecturer array
+
     const updated = await addLecturerToCourse(id, lecturerIds);
 
     return reply.send({ success: true, data: updated });
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Fail to add lecturer" });
+      .send({ success: false, message: "Fail to add lecturer", error });
   }
 }
 
@@ -110,6 +114,8 @@ export async function deleteLecturerFromCourseHandler(
         .code(404)
         .send({ success: false, message: "Course not found." });
 
+    //TODO: check if lecturer exist on the course lecturer array
+
     const updated = deleteLecturerFromCourse(id, lecturerId);
 
     return reply.send({ success: true, data: updated });
@@ -117,7 +123,7 @@ export async function deleteLecturerFromCourseHandler(
     console.error(error);
     return reply
       .code(500)
-      .send({ success: false, message: "Failed to remove lecturer" });
+      .send({ success: false, message: "Failed to remove lecturer", error });
   }
 }
 
@@ -131,6 +137,7 @@ export async function deleteCourseHandler(
   try {
     const { id } = req.params;
     const course = findCourseById(id);
+
     if (!course)
       return reply
         .code(404)
@@ -146,6 +153,6 @@ export async function deleteCourseHandler(
     console.error(error);
     return reply
       .code(500)
-      .send({ success: false, message: "Failed to delete course" });
+      .send({ success: false, message: "Failed to delete course", error });
   }
 }
