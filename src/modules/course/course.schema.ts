@@ -39,3 +39,11 @@ export const updateCourseDetails = zodToJsonSchema(
   updateCourseDetailsSchema,
   "UpdateCourseDetails"
 );
+
+export const otherResponse = zodToJsonSchema(
+  z.object({
+    success: z.boolean(),
+    message: z.string(),
+  }),
+  "otherResponse"
+);

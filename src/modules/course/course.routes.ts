@@ -11,6 +11,7 @@ import {
   createCourseResponse,
   updateCourseDetails,
   createCourse,
+  otherResponse,
 } from "./course.schema";
 
 export default async function coursesRoutes(server: FastifyInstance) {
@@ -44,21 +45,33 @@ export default async function coursesRoutes(server: FastifyInstance) {
       method: "patch",
       url: "/:id/addLecturer",
       handler: addLecturerToCourseHandler,
-      schema: {},
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
     },
 
     {
       method: "patch",
       url: "/:id/removeLecturer",
       handler: deleteLecturerFromCourseHandler,
-      schema: {},
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
     },
 
     {
       method: "delete",
       url: "/:id",
       handler: deleteCourseHandler,
-      schema: {},
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
     },
   ];
 
@@ -68,7 +81,7 @@ export default async function coursesRoutes(server: FastifyInstance) {
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: route?.preHandler,
+      preHandler: [server.authenticate, server.authorize(["ADMIN"])],
     });
   });
 }
