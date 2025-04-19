@@ -7,14 +7,18 @@ import {
 } from "./user.schema";
 import {
   changePassword,
+  changeResetCodeStatus,
+  createPasswordReset,
   createUser,
   deleteUser,
   findUserById,
   findUserByMatNumber,
   findUserEmail,
+  verifyResetCode,
 } from "./user.service";
 import { verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
+import { generateRandomCode } from "../../utils";
 
 interface LoginType {
   identifier: string;
@@ -91,12 +95,12 @@ export async function regStudentHandler(
     }
 
     const user = await createUser({ ...body, mustChangePassword: false });
+
     return reply.code(201).send({ success: true, data: user });
   } catch (error) {
-    console.error(error);
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong " });
+      .send({ success: false, message: "Something went wrong ", error });
   }
 }
 
@@ -120,17 +124,16 @@ export async function loginStudentHandler(
     if (!accessToken)
       return reply.code(401).send({ message: "Invalid matNumber or password" });
 
-    return reply.code(200).send({
+    return reply.code(201).send({
       success: true,
       data: {
         accessToken,
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong " });
+      .send({ success: false, message: "Something went wrong ", error });
   }
 }
 
@@ -159,10 +162,9 @@ export async function regLecturerHandler(
     });
     return reply.code(201).send({ success: true, data: user });
   } catch (error) {
-    console.error(error);
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong " });
+      .send({ success: false, message: "Something went wrong ", error });
   }
 }
 
@@ -192,10 +194,9 @@ export async function regAdminHandler(
 
     return reply.code(201).send({ success: true, data: user });
   } catch (error) {
-    console.error(error);
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong " });
+      .send({ success: false, message: "Something went wrong ", error });
   }
 }
 
@@ -221,17 +222,16 @@ export async function loginHandler(
         .code(401)
         .send({ success: false, message: "Invalid email or password" });
 
-    return reply.code(200).send({
+    return reply.code(201).send({
       success: true,
       data: {
         accessToken,
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong " });
+      .send({ success: false, message: "Something went wrong ", error });
   }
 }
 
@@ -247,11 +247,13 @@ export async function changePasswordHandler(
 
     await changePassword(body);
 
-    return reply.send({ success: true, message: "Password updated." });
+    return reply
+      .code(201)
+      .send({ success: true, message: "Password updated." });
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Failed to update password" });
+      .send({ success: false, message: "Failed to update password", error });
   }
 }
 
@@ -278,21 +280,104 @@ export async function deleteUserHandler(
 
     await deleteUser(id);
 
-    return reply.send({
+    return reply.code(201).send({
       success: true,
       message: `User with ID ${id} deleted successfully.`,
     });
   } catch (error) {
-    console.error(error);
     return reply.code(500).send({
       success: false,
       message: "Failed to delete user. Please try again later.",
+      error,
     });
   }
 }
 
-//TODO: EMAIL VERIFICATION HANDLER FOR CHANGING PASSWORD AND SENDING CODE
+//* EMAIL VERIFICATION HANDLER FOR CHANGING PASSWORD AND SENDING CODE
+export async function forgotPasswordHandler(
+  req: FastifyRequest<{
+    Body: { email: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { email } = req.body;
 
-//TODO: CODE VERIFICATION HANDLER FOR VERIFYING CODE SEND TO USER EMAIL
+    const user = await findUserEmail(email);
 
-//TODO: PASSWORD RESET HANDLER
+    if (!user)
+      return reply
+        .code(404)
+        .send({ success: false, message: "User not found." });
+
+    const code = generateRandomCode();
+
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 20);
+
+    await createPasswordReset({ code, email, expiresAt });
+
+    return reply
+      .code(201)
+      .send({ success: true, message: "Reset code sent to email" });
+  } catch (error) {
+    reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong", error });
+  }
+}
+
+//* CODE VERIFICATION HANDLER FOR VERIFYING CODE SEND TO USER EMAIL
+export async function verifyResetCodeHandler(
+  req: FastifyRequest<{
+    Body: { email: string; code: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { email, code } = req.body;
+
+    const validCode = await verifyResetCode({ email, code });
+
+    if (!validCode)
+      return reply
+        .code(400)
+        .send({ success: false, message: "Invalid or expired code" });
+
+    return reply.code(201).send({ success: true, message: "Code verified" });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong", error });
+  }
+}
+
+//* PASSWORD RESET HANDLER
+export async function resetPasswordHandler(
+  req: FastifyRequest<{
+    Body: ChangePasswordInput & { code: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { code, email, ...rest } = req.body;
+
+    const reset = await verifyResetCode({ email, code });
+
+    if (!reset)
+      return reply
+        .code(400)
+        .send({ success: false, message: "Invalid or expired code" });
+
+    await changePassword({ email, ...rest });
+
+    await changeResetCodeStatus(reset.id);
+
+    return reply
+      .code(201)
+      .send({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong", error });
+  }
+}

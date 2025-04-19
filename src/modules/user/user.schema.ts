@@ -47,7 +47,7 @@ const loginResponseSchema = z.object({
 
 const changePasswordSchema = z
   .object({
-    id: z.string(),
+    email: z.string().email(),
     newPassword: z
       .string()
       .min(6, "Password must be at least 6 characters long"),
@@ -58,6 +58,12 @@ const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+const passwordResetSchema = z.object({
+  email: z.string().email(),
+  code: z.string(),
+  expiresAt: z.date(),
+});
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export type LoginInputStudent = z.infer<typeof loginSchemaStudent>;
@@ -65,6 +71,8 @@ export type LoginInputStudent = z.infer<typeof loginSchemaStudent>;
 export type LoginInputLecturer = z.infer<typeof loginSchemaLecturer>;
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+export type PasswordResetInput = z.infer<typeof passwordResetSchema>;
 
 export const createUser = zodToJsonSchema(createUserSchema, "CreateUser");
 

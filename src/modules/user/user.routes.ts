@@ -11,11 +11,13 @@ import {
 import {
   changePasswordHandler,
   deleteUserHandler,
+  forgotPasswordHandler,
   loginHandler,
   loginStudentHandler,
   regAdminHandler,
   regLecturerHandler,
   regStudentHandler,
+  verifyResetCodeHandler,
 } from "./user.controller";
 
 interface RouteConfig {
@@ -122,6 +124,38 @@ export default async function userRoutes(server: FastifyInstance) {
         server.authenticate,
         server.authorize(["ADMIN", "LECTURER"]),
       ],
+    },
+
+    {
+      method: "post",
+      url: "/forgot-password",
+      handler: forgotPasswordHandler,
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
+    },
+
+    {
+      method: "post",
+      url: "/verify-reset-code",
+      handler: verifyResetCodeHandler,
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
+    },
+    {
+      method: "post",
+      url: "/reset-password",
+      handler: forgotPasswordHandler,
+      schema: {
+        response: {
+          201: otherResponse,
+        },
+      },
     },
   ];
 
