@@ -25,21 +25,17 @@ const updateCourseDetailsSchema = z.object({
   ...courseCore,
 });
 
-export type CreateCourseInput = z.infer<typeof createCourseSchema>;
-export type UpdateCourseDetails = z.infer<typeof updateCourseDetailsSchema>;
-
+// Zod schema to Json Schema
 export const createCourse = zodToJsonSchema(createCourseSchema, "CreateCourse");
 
 export const createCourseResponse = zodToJsonSchema(
   createCourseResponseSchema,
   "CreateCourseResponse"
 );
-
 export const updateCourseDetails = zodToJsonSchema(
   updateCourseDetailsSchema,
   "UpdateCourseDetails"
 );
-
 export const otherResponse = zodToJsonSchema(
   z.object({
     success: z.boolean(),
@@ -47,3 +43,7 @@ export const otherResponse = zodToJsonSchema(
   }),
   "otherResponse"
 );
+
+// Type Inference
+export type CreateCourseInput = z.infer<typeof createCourseSchema>;
+export type UpdateCourseDetails = z.infer<typeof updateCourseDetailsSchema>;

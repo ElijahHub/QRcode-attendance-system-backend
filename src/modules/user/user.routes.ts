@@ -20,13 +20,7 @@ import {
   verifyResetCodeHandler,
 } from "./user.controller";
 
-interface RouteConfig {
-  method: "post" | "get" | "put" | "delete";
-  url: string;
-  handler: any;
-  schema: any;
-  preHandler?: any;
-}
+import type { RouteConfig } from "../../types";
 
 export default async function userRoutes(server: FastifyInstance) {
   const studentRoutes: RouteConfig[] = [

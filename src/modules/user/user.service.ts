@@ -6,19 +6,24 @@ import {
   ChangePasswordInput,
   PasswordResetInput,
 } from "./user.schema";
+import _ from "lodash";
+
+const validatePasswordMatch = (password: string, confirmPassword: string) => {
+  if (password !== confirmPassword) throw new Error("Passwords do not match");
+};
 
 export async function createUser(input: CreateUserInput) {
   const { password, confirmPassword, matNumber, email, name, ...rest } = input;
 
-  if (password !== confirmPassword) throw new Error("Passwords do not match");
+  validatePasswordMatch(password, confirmPassword);
 
   const hashedPassword = await genHash(password);
 
   const user = await prisma.user.create({
     data: {
       name: structureName(name),
-      matNumber: matNumber?.toUpperCase(),
-      email: email.toLowerCase(),
+      matNumber: _.toUpper(matNumber),
+      email: _.toLower(email),
       password: hashedPassword,
       ...rest,
     },
@@ -30,8 +35,7 @@ export async function createUser(input: CreateUserInput) {
 export async function changePassword(input: ChangePasswordInput) {
   const { email, newPassword, confirmPassword } = input;
 
-  if (newPassword !== confirmPassword)
-    throw new Error("Passwords do not match");
+  validatePasswordMatch(newPassword, confirmPassword);
 
   const hashedPassword = await genHash(newPassword);
 

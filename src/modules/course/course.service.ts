@@ -1,3 +1,4 @@
+import _ from "lodash";
 import prisma from "../../utils/prisma";
 import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 
@@ -6,7 +7,7 @@ export async function createCourse(input: CreateCourseInput) {
 
   return await prisma.course.create({
     data: {
-      courseCode: courseCode.toUpperCase(),
+      courseCode: _.toUpper(courseCode),
       ...rest,
       lecturers: {
         connect: input.lecturerIds.map((id) => ({ id })),
@@ -26,7 +27,7 @@ export async function updateCourseDetails(
   return await prisma.course.update({
     where: { id: courseId },
     data: {
-      courseCode: courseCode.toUpperCase(),
+      courseCode: _.toUpper(courseCode),
       ...rest,
     },
   });
@@ -40,7 +41,7 @@ export async function findCourseById(courseId: string) {
 
 export async function findCourseByCourseCode(courseCode: string) {
   return await prisma.course.findUnique({
-    where: { courseCode },
+    where: { courseCode: _.toUpper(courseCode) },
   });
 }
 

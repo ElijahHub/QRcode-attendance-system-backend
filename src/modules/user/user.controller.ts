@@ -19,6 +19,7 @@ import {
 import { verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
 import { generateRandomCode } from "../../utils";
+import _ from "lodash";
 
 interface LoginType {
   identifier: string;
@@ -35,7 +36,7 @@ async function loginUser({ identifier, password, type, reply }: LoginType) {
       ? await findUserByMatNumber(identifier)
       : await findUserEmail(identifier);
 
-  if (!user) return null;
+  if (_.isEmpty(user)) return null;
 
   //? CHECK FOR PASSWORD VALIDITY
   const correctPassword = await verifyPassword({
@@ -94,7 +95,9 @@ export async function regStudentHandler(
       }
     }
 
-    const user = await createUser({ ...body, mustChangePassword: false });
+    const user = await createUser(
+      _.merge({}, body, { mustChangePassword: false })
+    );
 
     return reply.code(201).send({ success: true, data: user });
   } catch (error) {
@@ -267,7 +270,7 @@ export async function deleteUserHandler(
 
     const user = await findUserById(id);
 
-    if (!user)
+    if (_.isEmpty(user))
       return reply
         .code(404)
         .send({ success: false, message: "User not found." });
@@ -305,7 +308,7 @@ export async function forgotPasswordHandler(
 
     const user = await findUserEmail(email);
 
-    if (!user)
+    if (_.isEmpty(user))
       return reply
         .code(404)
         .send({ success: false, message: "User not found." });
@@ -338,7 +341,7 @@ export async function verifyResetCodeHandler(
 
     const validCode = await verifyResetCode({ email, code });
 
-    if (!validCode)
+    if (_.isEmpty(validCode))
       return reply
         .code(400)
         .send({ success: false, message: "Invalid or expired code" });
@@ -363,7 +366,7 @@ export async function resetPasswordHandler(
 
     const reset = await verifyResetCode({ email, code });
 
-    if (!reset)
+    if (_.isEmpty(reset))
       return reply
         .code(400)
         .send({ success: false, message: "Invalid or expired code" });

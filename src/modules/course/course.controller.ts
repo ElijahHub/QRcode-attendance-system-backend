@@ -9,7 +9,9 @@ import {
   findCourseById,
   updateCourseDetails,
 } from "./course.service";
+import _ from "lodash";
 
+// Create course handler
 export async function createCourseHandler(
   req: FastifyRequest<{
     Body: CreateCourseInput;
@@ -35,7 +37,7 @@ export async function createCourseHandler(
   }
 }
 
-//TODO: update course details
+// Update course details
 export async function updateCourseDetailsHandler(
   req: FastifyRequest<{
     Body: UpdateCourseDetails;
@@ -64,7 +66,7 @@ export async function updateCourseDetailsHandler(
   }
 }
 
-//TODO: ADD LECTURER TO COURSE
+// ADD LECTURER TO COURSE
 export async function addLecturerToCourseHandler(
   req: FastifyRequest<{
     Body: { lecturerIds: string[] };
@@ -95,7 +97,7 @@ export async function addLecturerToCourseHandler(
   }
 }
 
-//TODO: remove a lecturer from a course
+// Remove a lecturer from a course
 export async function deleteLecturerFromCourseHandler(
   req: FastifyRequest<{
     Body: { lecturerId: string };
@@ -120,14 +122,13 @@ export async function deleteLecturerFromCourseHandler(
 
     return reply.send({ success: true, data: updated });
   } catch (error) {
-    console.error(error);
     return reply
       .code(500)
       .send({ success: false, message: "Failed to remove lecturer", error });
   }
 }
 
-//TODO: delete a course
+// Delete a course
 export async function deleteCourseHandler(
   req: FastifyRequest<{
     Params: { id: string };
@@ -138,7 +139,7 @@ export async function deleteCourseHandler(
     const { id } = req.params;
     const course = findCourseById(id);
 
-    if (!course)
+    if (_.isEmpty(course))
       return reply
         .code(404)
         .send({ success: false, message: "Course not found." });
@@ -150,7 +151,6 @@ export async function deleteCourseHandler(
       message: `Course with ID ${id} deleted successfully.`,
     });
   } catch (error) {
-    console.error(error);
     return reply
       .code(500)
       .send({ success: false, message: "Failed to delete course", error });

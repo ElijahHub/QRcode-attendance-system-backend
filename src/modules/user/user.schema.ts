@@ -1,6 +1,7 @@
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
+//Common User field
 const userCore = {
   matNumber: z.string().optional(),
   name: z.string().min(5, "Name must be at least 5 characters long"),
@@ -9,6 +10,7 @@ const userCore = {
   mustChangePassword: z.boolean().optional(),
 };
 
+// Create User Schema
 const createUserSchema = z
   .object({
     ...userCore,
@@ -20,6 +22,7 @@ const createUserSchema = z
     path: ["confirmPassword"],
   });
 
+// Create User schema response
 const createUserResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
@@ -28,6 +31,7 @@ const createUserResponseSchema = z.object({
   }),
 });
 
+//Login Schema
 const loginSchemaStudent = z.object({
   matNumber: z.string(),
   password: z.string(),
@@ -45,6 +49,7 @@ const loginResponseSchema = z.object({
   }),
 });
 
+// Change password schema
 const changePasswordSchema = z
   .object({
     email: z.string().email(),
@@ -58,43 +63,29 @@ const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+// Password reset schema
 const passwordResetSchema = z.object({
   email: z.string().email(),
   code: z.string(),
   expiresAt: z.date(),
 });
 
-export type CreateUserInput = z.infer<typeof createUserSchema>;
-
-export type LoginInputStudent = z.infer<typeof loginSchemaStudent>;
-
-export type LoginInputLecturer = z.infer<typeof loginSchemaLecturer>;
-
-export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
-
-export type PasswordResetInput = z.infer<typeof passwordResetSchema>;
-
+// Zod schemas to Json Schema
 export const createUser = zodToJsonSchema(createUserSchema, "CreateUser");
-
 export const createUserResponse = zodToJsonSchema(
   createUserResponseSchema,
   "CreateUserResponse"
 );
-
 export const loginStudent = zodToJsonSchema(loginSchemaStudent, "Login");
-
 export const loginLecturer = zodToJsonSchema(loginSchemaLecturer, "Login");
-
 export const loginResponse = zodToJsonSchema(
   loginResponseSchema,
   "LoginResponse"
 );
-
 export const changePassword = zodToJsonSchema(
   changePasswordSchema,
   "ChangePassword"
 );
-
 export const otherResponse = zodToJsonSchema(
   z.object({
     success: z.boolean(),
@@ -102,3 +93,10 @@ export const otherResponse = zodToJsonSchema(
   }),
   "otherResponse"
 );
+
+// Type Inference
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type LoginInputStudent = z.infer<typeof loginSchemaStudent>;
+export type LoginInputLecturer = z.infer<typeof loginSchemaLecturer>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type PasswordResetInput = z.infer<typeof passwordResetSchema>;
