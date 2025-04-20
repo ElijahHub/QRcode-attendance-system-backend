@@ -19,17 +19,23 @@ export async function createCourseHandler(
   reply: FastifyReply
 ) {
   try {
-    const course = await createCourse(req.body);
+    const { courseCode } = req.body;
 
-    const exist = await findCourseByCourseCode(course.courseCode);
-
-    //TODO: check if course already exist using unique corse code
+    const exist = await findCourseByCourseCode(courseCode);
     if (exist)
       return reply.code(409).send({
+        success: false,
         message: "A course with this course code already exist",
       });
 
-    return reply.code(201).send({ success: true, data: course });
+    const course = await createCourse(req.body);
+
+    return reply.code(201).send({
+      success: true,
+      data: _.merge({}, course, {
+        lecturerIds: course?.lecturers.map((lect) => lect.id),
+      }),
+    });
   } catch (error) {
     return reply
       .code(500)
@@ -46,15 +52,22 @@ export async function updateCourseDetailsHandler(
   reply: FastifyReply
 ) {
   try {
+    console.log("passed");
     const { id } = req.params;
     const body = req.body;
 
     const course = await findCourseById(id);
-
-    if (!course)
+    if (_.isEmpty(course))
       return reply
         .code(404)
         .send({ success: false, message: "Course not found." });
+
+    const exist = await findCourseByCourseCode(body.courseCode);
+    if (exist)
+      return reply.code(409).send({
+        success: false,
+        message: "A course with this course code already exist",
+      });
 
     const updated = await updateCourseDetails(id, body);
 
@@ -79,17 +92,22 @@ export async function addLecturerToCourseHandler(
     const { lecturerIds } = req.body;
 
     const course = await findCourseById(id);
-
-    if (!course)
+    if (_.isEmpty(course))
       return reply
         .code(404)
         .send({ success: false, message: "Course not found." });
 
-    //TODO: check if lecturer already exist on the course lecturer array
+    const { lecturers, ...updated } = await addLecturerToCourse(
+      id,
+      lecturerIds
+    );
 
-    const updated = await addLecturerToCourse(id, lecturerIds);
-
-    return reply.send({ success: true, data: updated });
+    return reply.send({
+      success: true,
+      data: _.merge({}, updated, {
+        lecturerIds: lecturers.map((lect) => lect.id),
+      }),
+    });
   } catch (error) {
     return reply
       .code(500)
@@ -110,13 +128,10 @@ export async function deleteLecturerFromCourseHandler(
     const { lecturerId } = req.body;
 
     const course = await findCourseById(id);
-
-    if (!course)
+    if (_.isEmpty(course))
       return reply
         .code(404)
         .send({ success: false, message: "Course not found." });
-
-    //TODO: check if lecturer exist on the course lecturer array
 
     const updated = deleteLecturerFromCourse(id, lecturerId);
 
@@ -137,8 +152,8 @@ export async function deleteCourseHandler(
 ) {
   try {
     const { id } = req.params;
-    const course = findCourseById(id);
 
+    const course = await findCourseById(id);
     if (_.isEmpty(course))
       return reply
         .code(404)

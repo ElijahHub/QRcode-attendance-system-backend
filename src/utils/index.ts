@@ -1,12 +1,11 @@
+import _ from "lodash";
+
 export function structureName(name: string) {
-  return name
-    .split(" ")
-    .map((t, i) => t[0].toUpperCase() + t.slice(1))
-    .join(" ");
+  return _.capitalize(_.toLower(name));
 }
 
 export function generateRandomCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return _.random(100000, 999999).toString();
 }
 
 export async function sendResetEmail(email: string, code: string) {
