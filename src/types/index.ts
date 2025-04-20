@@ -5,3 +5,8 @@ export interface RouteConfig {
   schema: any;
   preHandler?: any;
 }
+
+export interface VerifyPassInput {
+  candPassword: string;
+  hash: string;
+}
