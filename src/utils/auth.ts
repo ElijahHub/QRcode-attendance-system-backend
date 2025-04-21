@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import argon2 from "argon2";
 import _ from "lodash";
-import { ENCRYPTION_KEY } from "../config";
+import { ENCRYPTION_KEY, HMAC_KEY } from "../config";
 import { VerifyPassInput } from "../types";
 
 //* Hash Generator Function
@@ -20,7 +20,7 @@ export function verifyPassword({ candPassword, hash }: VerifyPassInput) {
 }
 
 //? Checking if Encryption key is not Null
-if (!ENCRYPTION_KEY) throw new Error("Encryption Key is Missing");
+if (!ENCRYPTION_KEY || !HMAC_KEY) throw new Error("Encryption Key is Missing");
 
 // Converting Key to Buffer
 const SECRET_KEY = Buffer.from(ENCRYPTION_KEY, "base64");
@@ -56,4 +56,14 @@ export function decrypt(data: string) {
   decrypted += decipher.final("utf8");
 
   return decrypted;
+}
+
+const HMAC_SECRET_KEY = Buffer.from(HMAC_KEY, "base64");
+
+//* HMAC SHA256 HASHING
+export function generateHmac(data: string) {
+  return crypto
+    .createHmac("sha256", HMAC_SECRET_KEY)
+    .update(data)
+    .digest("hex");
 }

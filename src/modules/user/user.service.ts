@@ -1,3 +1,4 @@
+import _ from "lodash";
 import prisma from "../../utils/prisma";
 import { genHash } from "../../utils/auth";
 import { structureName } from "../../utils";
@@ -6,7 +7,6 @@ import {
   ChangePasswordInput,
   PasswordResetInput,
 } from "./user.schema";
-import _ from "lodash";
 
 const validatePasswordMatch = (password: string, confirmPassword: string) => {
   if (password !== confirmPassword) throw new Error("Passwords do not match");

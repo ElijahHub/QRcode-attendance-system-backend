@@ -15,8 +15,10 @@ datasource db {
 
 model User{
   id String @id  @default(uuid())
-  email String @unique
-  matNumber String? @unique
+  email String 
+  emailMac String @unique
+  matNumber String? 
+  matNumberMac String? @unique
   name String
   password String
   role Role @default(STUDENT)
@@ -34,6 +36,7 @@ model User{
 model Course {
   id String @id @default(uuid())
   courseCode String @unique 
+  courseCodeMac String @unique
   courseName String @unique
   description String? @db.VarChar(500)
   createdAt DateTime @default(now())
