@@ -14,7 +14,6 @@ const seRoutes: RouteConfig[] = [
         201: createSessionResponse,
       },
     },
-    preHandler: true,
   },
 ];
 
@@ -25,9 +24,7 @@ export default async function sessionRoutes(server: FastifyInstance) {
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: route.preHandler
-        ? [server.authenticate, server.authorize(["LECTURER"])]
-        : [server.authenticate, server.authorize(["STUDENT"])],
+      preHandler: [server.authenticate, server.authorize(["LECTURER"])],
     });
   });
 }

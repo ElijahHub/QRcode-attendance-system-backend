@@ -4,14 +4,17 @@ import zodToJsonSchema from "zod-to-json-schema";
 const createSessionSchema = z.object({
   courseId: z.string(),
   expiresAt: z.date(),
-  geolocationData: z.string(),
+  geolocationData: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
 });
 
 const createSessionResponseSchema = z.object({
-  courseId: z.string(),
-  expiresAt: z.date(),
-  geolocationData: z.string(),
-  lecturerId: z.string(),
+  success: z.boolean(),
+  data: z.object({
+    qrData: z.string(),
+  }),
 });
 
 // Zod schemas to Json Schema

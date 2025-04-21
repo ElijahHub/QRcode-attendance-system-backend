@@ -75,7 +75,7 @@ model AttendanceRecords {
 }
 
 
-model PasswordRest {
+model PasswordReset {
   id String @id @default(uuid())
   email String
   code String
