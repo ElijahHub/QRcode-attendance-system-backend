@@ -6,6 +6,7 @@ import {
   findAttendanceRecord,
   findSessionById,
 } from "./attendance.service";
+import { validateProximity } from "../../utils";
 
 export async function scanQrCodeHandler(
   req: FastifyRequest<{
@@ -35,6 +36,19 @@ export async function scanQrCodeHandler(
         message: "Session Not Found",
       });
 
+    // GeoLocation Proximity Validation
+    const location = validateProximity({
+      studentLocation: body.geolocationData,
+      sessionLocation: JSON.parse(session.geolocationData),
+      radMeter: 1000,
+    });
+
+    if (!location)
+      return reply.code(404).send({
+        success: false,
+        message: "Invalid Location",
+      });
+
     const alreadyMarked = await findAttendanceRecord({
       sessionId,
       studentId,
@@ -51,8 +65,6 @@ export async function scanQrCodeHandler(
         success: false,
         message: "Session Expired",
       });
-
-    //TODO: Add GeoLocation Proximity Validation
 
     const record = await createAttendanceRecord({
       sessionId,
