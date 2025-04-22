@@ -36,7 +36,6 @@ model User{
 model Course {
   id String @id @default(uuid())
   courseCode String @unique 
-  courseCodeMac String @unique
   courseName String @unique
   description String? @db.VarChar(500)
   createdAt DateTime @default(now())
