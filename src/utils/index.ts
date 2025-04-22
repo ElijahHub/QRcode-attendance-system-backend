@@ -2,7 +2,7 @@ import { getDistance } from "geolib";
 import _ from "lodash";
 
 export function structureName(name: string) {
-  return _.capitalize(_.toLower(name));
+  return _.startCase(_.toLower(name));
 }
 
 export function generateRandomCode() {

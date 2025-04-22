@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateSessionInput } from "./session.schema";
 import { createSession } from "./session.service";
 import _ from "lodash";
+import { encrypt } from "../../utils/auth";
 
 export async function createSessionHandler(
   req: FastifyRequest<{
@@ -19,19 +20,19 @@ export async function createSessionHandler(
         message: "Unauthorized. Lecturer not found in request.",
       });
 
-    const { id, expiresAt, geolocationData } = await createSession(
+    const { id } = await createSession(
       _.merge({}, body, { lecturerId: user._id })
     );
 
     const qrPayload = {
       id,
-      expiresAt,
-      geolocationData,
     };
 
     const qrData = Buffer.from(JSON.stringify(qrPayload)).toString("base64");
 
-    return reply.code(201).send({ success: true, data: { qrData } });
+    return reply
+      .code(201)
+      .send({ success: true, data: { qrData: encrypt(qrData) } });
   } catch (error) {
     return reply
       .code(500)

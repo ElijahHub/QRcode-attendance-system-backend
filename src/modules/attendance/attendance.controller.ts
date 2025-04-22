@@ -1,12 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import _ from "lodash";
-import { QrData, ScanData } from "./attendance.schema";
+import { ScanData } from "./attendance.schema";
 import {
   createAttendanceRecord,
   findAttendanceRecord,
   findSessionById,
 } from "./attendance.service";
 import { validateProximity } from "../../utils";
+import { decrypt } from "../../utils/auth";
 
 export async function scanQrCodeHandler(
   req: FastifyRequest<{
@@ -24,8 +25,10 @@ export async function scanQrCodeHandler(
         message: "Unauthorized. User not found in request.",
       });
 
-    const { id: sessionId }: QrData = JSON.parse(
-      Buffer.from(body.qrData, "base64").toString()
+    const decryptData = decrypt(body.qrData);
+
+    const { id: sessionId }: { id: string } = JSON.parse(
+      Buffer.from(decryptData, "base64").toString()
     );
 
     const session = await findSessionById(sessionId);
@@ -44,7 +47,7 @@ export async function scanQrCodeHandler(
     });
 
     if (!location)
-      return reply.code(404).send({
+      return reply.code(401).send({
         success: false,
         message: "Invalid Location",
       });

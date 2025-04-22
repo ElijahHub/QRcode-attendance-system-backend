@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import {
   ChangePasswordInput,
   CreateUserInput,
+  CreateUserWithOutPass,
   LoginInputLecturer,
   LoginInputStudent,
 } from "./user.schema";
@@ -16,7 +17,7 @@ import {
   findUserEmail,
   verifyResetCode,
 } from "./user.service";
-import { verifyPassword } from "../../utils/auth";
+import { decrypt, verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
 import { generateRandomCode } from "../../utils";
 import _ from "lodash";
@@ -95,11 +96,18 @@ export async function regStudentHandler(
       }
     }
 
-    const user = await createUser(
+    const { name, matNumber, email, ...rest } = await createUser(
       _.merge({}, body, { mustChangePassword: false })
     );
 
-    return reply.code(201).send({ success: true, data: user });
+    return reply.code(201).send({
+      success: true,
+      data: _.merge({}, rest, {
+        name: decrypt(name),
+        matNumber: matNumber && decrypt(matNumber),
+        email: decrypt(email),
+      }),
+    });
   } catch (error) {
     return reply
       .code(500)
@@ -143,7 +151,7 @@ export async function loginStudentHandler(
 //* LECTURER REGISTRATION HANDLER
 export async function regLecturerHandler(
   req: FastifyRequest<{
-    Body: CreateUserInput;
+    Body: CreateUserWithOutPass;
   }>,
   reply: FastifyReply
 ) {
@@ -157,13 +165,22 @@ export async function regLecturerHandler(
       });
     }
 
-    const user = await createUser({
-      ...body,
-      password: "000000",
-      confirmPassword: "000000",
-      role: "LECTURER",
+    const { name, matNumber, email, ...rest } = await createUser(
+      _.merge({}, body, {
+        password: "000000",
+        confirmPassword: "000000",
+        role: "LECTURER",
+      })
+    );
+
+    return reply.code(201).send({
+      success: true,
+      data: _.merge({}, rest, {
+        name: decrypt(name),
+        matNumber: matNumber && decrypt(matNumber),
+        email: decrypt(email),
+      }),
     });
-    return reply.code(201).send({ success: true, data: user });
   } catch (error) {
     return reply
       .code(500)
@@ -174,7 +191,7 @@ export async function regLecturerHandler(
 //* ADMIN REGISTRATION HANDLER
 export async function regAdminHandler(
   req: FastifyRequest<{
-    Body: CreateUserInput;
+    Body: CreateUserWithOutPass;
   }>,
   reply: FastifyReply
 ) {
@@ -188,14 +205,22 @@ export async function regAdminHandler(
       });
     }
 
-    const user = await createUser({
-      ...body,
-      password: "000000",
-      confirmPassword: "000000",
-      role: "ADMIN",
-    });
+    const { name, matNumber, email, ...rest } = await createUser(
+      _.merge({}, body, {
+        password: "000000",
+        confirmPassword: "000000",
+        role: "ADMIN",
+      })
+    );
 
-    return reply.code(201).send({ success: true, data: user });
+    return reply.code(201).send({
+      success: true,
+      data: _.merge({}, rest, {
+        name: decrypt(name),
+        matNumber: matNumber && decrypt(matNumber),
+        email: decrypt(email),
+      }),
+    });
   } catch (error) {
     return reply
       .code(500)
@@ -339,12 +364,22 @@ export async function verifyResetCodeHandler(
   try {
     const { email, code } = req.body;
 
-    const validCode = await verifyResetCode({ email, code });
+    const validCode = await verifyResetCode({ email });
 
     if (_.isEmpty(validCode))
       return reply
         .code(400)
         .send({ success: false, message: "Invalid or expired code" });
+
+    const correctCode = await verifyPassword({
+      candPassword: code,
+      hash: validCode.code,
+    });
+
+    if (!correctCode)
+      return reply
+        .code(400)
+        .send({ success: false, message: "Incorrect code" });
 
     return reply.code(201).send({ success: true, message: "Code verified" });
   } catch (error) {
@@ -364,12 +399,22 @@ export async function resetPasswordHandler(
   try {
     const { code, email, ...rest } = req.body;
 
-    const reset = await verifyResetCode({ email, code });
+    const reset = await verifyResetCode({ email });
 
     if (_.isEmpty(reset))
       return reply
         .code(400)
         .send({ success: false, message: "Invalid or expired code" });
+
+    const correctCode = await verifyPassword({
+      candPassword: code,
+      hash: reset.code,
+    });
+
+    if (!correctCode)
+      return reply
+        .code(400)
+        .send({ success: false, message: "Incorrect code" });
 
     await changePassword({ email, ...rest });
 

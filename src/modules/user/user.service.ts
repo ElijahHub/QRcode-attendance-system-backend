@@ -1,6 +1,6 @@
 import _ from "lodash";
 import prisma from "../../utils/prisma";
-import { genHash } from "../../utils/auth";
+import { encrypt, generateHmac, genHash } from "../../utils/auth";
 import { structureName } from "../../utils";
 import {
   CreateUserInput,
@@ -13,23 +13,26 @@ const validatePasswordMatch = (password: string, confirmPassword: string) => {
 };
 
 export async function createUser(input: CreateUserInput) {
-  const { password, confirmPassword, matNumber, email, name, ...rest } = input;
+  const { password, confirmPassword, name, matNumber, email, ...rest } = input;
 
   validatePasswordMatch(password, confirmPassword);
 
   const hashedPassword = await genHash(password);
 
-  const user = await prisma.user.create({
+  const upperMatNumber = _.toUpper(matNumber);
+  const lowerEmail = _.toLower(email);
+
+  return prisma.user.create({
     data: {
-      name: structureName(name),
-      matNumber: _.toUpper(matNumber),
-      email: _.toLower(email),
+      name: encrypt(structureName(name)),
+      matNumber: matNumber ? encrypt(upperMatNumber) : null,
+      matNumberMac: matNumber ? generateHmac(upperMatNumber) : null,
+      email: encrypt(lowerEmail),
+      emailMac: generateHmac(lowerEmail),
       password: hashedPassword,
       ...rest,
     },
   });
-
-  return user;
 }
 
 export async function changePassword(input: ChangePasswordInput) {
@@ -38,9 +41,10 @@ export async function changePassword(input: ChangePasswordInput) {
   validatePasswordMatch(newPassword, confirmPassword);
 
   const hashedPassword = await genHash(newPassword);
+  const lowerEmail = _.toLower(email);
 
-  return await prisma.user.update({
-    where: { email },
+  return prisma.user.update({
+    where: { emailMac: generateHmac(lowerEmail) },
     data: {
       password: hashedPassword,
       mustChangePassword: false,
@@ -49,17 +53,19 @@ export async function changePassword(input: ChangePasswordInput) {
 }
 
 export async function findUserByMatNumber(matNumber: string) {
+  const upperMatNumber = _.toUpper(matNumber);
   return await prisma.user.findUnique({
     where: {
-      matNumber: matNumber.toUpperCase(),
+      matNumberMac: generateHmac(upperMatNumber),
     },
   });
 }
 
 export async function findUserEmail(email: string) {
+  const lowerEmail = _.toLower(email);
   return await prisma.user.findUnique({
     where: {
-      email: email.toLowerCase(),
+      emailMac: generateHmac(lowerEmail),
     },
   });
 }
@@ -88,24 +94,24 @@ export async function deleteUser(id: string) {
 }
 
 export async function createPasswordReset(input: PasswordResetInput) {
-  return await prisma.passwordRest.create({
+  const { email, code, ...rest } = input;
+  const lowerEmail = _.toLower(email);
+  const hashCode = await genHash(code);
+
+  return await prisma.passwordReset.create({
     data: {
-      ...input,
+      emailMac: generateHmac(lowerEmail),
+      email: encrypt(lowerEmail),
+      code: hashCode,
+      ...rest,
     },
   });
 }
 
-export async function verifyResetCode({
-  email,
-  code,
-}: {
-  email: string;
-  code: string;
-}) {
-  return await prisma.passwordRest.findFirst({
+export async function verifyResetCode({ email }: { email: string }) {
+  return await prisma.passwordReset.findFirst({
     where: {
-      email,
-      code,
+      emailMac: generateHmac(_.toLower(email)),
       used: false,
       expiresAt: { gt: new Date() },
     },
@@ -113,7 +119,7 @@ export async function verifyResetCode({
 }
 
 export async function changeResetCodeStatus(id: string) {
-  return await prisma.passwordRest.update({
+  return await prisma.passwordReset.update({
     where: { id },
     data: { used: true },
   });

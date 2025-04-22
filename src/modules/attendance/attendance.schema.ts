@@ -9,12 +9,6 @@ const scanDataSchema = z.object({
   }),
 });
 
-const qrDataSchema = z.object({
-  id: z.string().uuid("Invalid id format"),
-  expiresAt: z.date(),
-  geolocationData: z.string(),
-});
-
 const createAttendanceSchema = z.object({
   sessionId: z.string().uuid("Invalid id format"),
   studentId: z.string().uuid("Invalid id format"),
@@ -29,5 +23,4 @@ export const createAttendance = zodToJsonSchema(
 
 //Type Inference
 export type ScanData = z.infer<typeof scanDataSchema>;
-export type QrData = z.infer<typeof qrDataSchema>;
 export type CreateAttendanceInput = z.infer<typeof createAttendanceSchema>;

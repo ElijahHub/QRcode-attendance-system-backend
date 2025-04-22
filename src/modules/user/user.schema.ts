@@ -25,6 +25,11 @@ const createUserSchema = z
     path: ["confirmPassword"],
   });
 
+//Create Admin/User Schema
+const inputWithOutPass = z.object({
+  ...userCore,
+});
+
 // Create User schema response
 const createUserResponseSchema = z.object({
   success: z.boolean(),
@@ -77,6 +82,10 @@ const passwordResetSchema = z.object({
 
 // Zod schemas to Json Schema
 export const createUser = zodToJsonSchema(createUserSchema, "CreateUser");
+export const createUserWithoutPass = zodToJsonSchema(
+  inputWithOutPass,
+  "NoPassNeeded"
+);
 export const createUserResponse = zodToJsonSchema(
   createUserResponseSchema,
   "CreateUserResponse"
@@ -101,6 +110,7 @@ export const otherResponse = zodToJsonSchema(
 
 // Type Inference
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type CreateUserWithOutPass = z.infer<typeof inputWithOutPass>;
 export type LoginInputStudent = z.infer<typeof loginSchemaStudent>;
 export type LoginInputLecturer = z.infer<typeof loginSchemaLecturer>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

@@ -7,6 +7,7 @@ import {
   loginLecturer,
   changePassword,
   otherResponse,
+  createUserWithoutPass,
 } from "./user.schema";
 import {
   changePasswordHandler,
@@ -54,7 +55,7 @@ const lecturerRoutes: RouteConfig[] = [
     url: "/lecturer",
     handler: regLecturerHandler,
     schema: {
-      body: createUser,
+      body: createUserWithoutPass,
       response: {
         201: createUserResponse,
       },
@@ -81,7 +82,7 @@ const adminRoutes: RouteConfig[] = [
     url: "/admin",
     handler: regAdminHandler,
     schema: {
-      body: createUser,
+      body: createUserWithoutPass,
       response: {
         201: createUserResponse,
       },
