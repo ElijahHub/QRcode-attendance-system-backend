@@ -10,14 +10,14 @@ const scanDataSchema = z.object({
 });
 
 const qrDataSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid("Invalid id format"),
   expiresAt: z.date(),
   geolocationData: z.string(),
 });
 
 const createAttendanceSchema = z.object({
-  sessionId: z.string(),
-  studentId: z.string(),
+  sessionId: z.string().uuid("Invalid id format"),
+  studentId: z.string().uuid("Invalid id format"),
 });
 
 //Zod Schema to Json

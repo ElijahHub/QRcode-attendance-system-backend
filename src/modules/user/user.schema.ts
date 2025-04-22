@@ -3,7 +3,10 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 //Common User field
 const userCore = {
-  matNumber: z.string().optional(),
+  matNumber: z
+    .string()
+    .regex(/^[uU]\d{2}[a-zA-Z]{2,3}\d{4}$/, "Invalid matNumber format.")
+    .optional(),
   name: z.string().min(5, "Name must be at least 5 characters long"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["STUDENT", "LECTURER", "ADMIN"]).optional(),
@@ -26,14 +29,16 @@ const createUserSchema = z
 const createUserResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
-    id: z.string(),
+    id: z.string().uuid("invalid id"),
     ...userCore,
   }),
 });
 
 //Login Schema
 const loginSchemaStudent = z.object({
-  matNumber: z.string(),
+  matNumber: z
+    .string()
+    .regex(/^[uU]\d{2}[a-zA-Z]{2,3}\d{4}$/, "Invalid matNumber format."),
   password: z.string(),
 });
 
@@ -52,7 +57,7 @@ const loginResponseSchema = z.object({
 // Change password schema
 const changePasswordSchema = z
   .object({
-    email: z.string().email(),
+    email: z.string().email("Invalid email address"),
     newPassword: z
       .string()
       .min(6, "Password must be at least 6 characters long"),
@@ -65,7 +70,7 @@ const changePasswordSchema = z
 
 // Password reset schema
 const passwordResetSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email("Invalid email address"),
   code: z.string(),
   expiresAt: z.date(),
 });
