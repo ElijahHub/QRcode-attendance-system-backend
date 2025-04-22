@@ -1,3 +1,4 @@
+import { getDistance } from "geolib";
 import _ from "lodash";
 
 export function structureName(name: string) {
@@ -10,4 +11,24 @@ export function generateRandomCode() {
 
 export async function sendResetEmail(email: string, code: string) {
   console.log(`Sending reset code ${code} to ${email}`);
+}
+
+export function validateProximity({
+  studentLocation,
+  sessionLocation,
+  radMeter = 100,
+}: {
+  studentLocation: { latitude: number; longitude: number };
+  sessionLocation: { latitude: number; longitude: number };
+  radMeter: number;
+}) {
+  const distance = getDistance(
+    {
+      latitude: studentLocation.latitude,
+      longitude: studentLocation.longitude,
+    },
+    { latitude: sessionLocation.latitude, longitude: sessionLocation.longitude }
+  );
+
+  return distance <= radMeter;
 }

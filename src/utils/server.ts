@@ -12,6 +12,7 @@ import { CORS_ORIGIN, privateKeyPath, publicKeyPath } from "../config";
 import userRoutes from "../modules/user/user.routes";
 import coursesRoutes from "../modules/course/course.routes";
 import sessionRoutes from "../modules/session/session.routes";
+import attendanceRoutes from "../modules/attendance/attendance.routes";
 
 export default function server() {
   const app = fastify({
@@ -90,6 +91,7 @@ export default function server() {
   app.register(userRoutes, { prefix: "api/v1/user" });
   app.register(coursesRoutes, { prefix: "api/v1/courses" });
   app.register(sessionRoutes, { prefix: "api/v1/session" });
+  app.register(attendanceRoutes, { prefix: "api/v1/attendance" });
 
   return app;
 }
