@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   ChangePasswordInput,
@@ -20,14 +21,7 @@ import {
 import { decrypt, verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
 import { generateRandomCode, sendResetEmail } from "../../utils";
-import _ from "lodash";
-
-interface LoginType {
-  identifier: string;
-  password: string;
-  type: "matNumber" | "email";
-  reply: FastifyReply;
-}
+import { LoginType } from "../../types";
 
 //* USER LOGIN HELPER FUNCTION
 async function loginUser({ identifier, password, type, reply }: LoginType) {

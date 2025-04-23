@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 import {
@@ -9,7 +10,6 @@ import {
   findCourseById,
   updateCourseDetails,
 } from "./course.service";
-import _ from "lodash";
 
 // Create course handler
 export async function createCourseHandler(
