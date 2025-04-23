@@ -46,7 +46,7 @@ export async function scanQrCodeHandler(
       radMeter: 1000,
     });
 
-    if (_.isEmpty(location))
+    if (!location)
       return reply.code(401).send({
         success: false,
         message: "Invalid Location",
@@ -81,3 +81,9 @@ export async function scanQrCodeHandler(
       .send({ success: false, message: "Something went wrong " });
   }
 }
+
+//TODO: GET ATTENDANCE RECORD FOR A PARTICULAR COURSE
+
+//TODO: GET ATTENDANCE RECORD FOR A PARTICULAR COURSE FOR A SESSION
+
+//TODO: GET ATTENDANCE RECORD FOR A PARTICULAR STUDENT ON A PARTICULAR COURSE

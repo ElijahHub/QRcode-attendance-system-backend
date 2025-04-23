@@ -25,7 +25,7 @@ export async function createSessionHandler(
         message: "Unauthorized. Lecturer not found in request.",
       });
 
-    const course = findCourseById(body.courseId);
+    const course = await findCourseById(body.courseId);
 
     if (_.isEmpty(course))
       return reply.code(404).send({

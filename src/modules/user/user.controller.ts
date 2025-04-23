@@ -126,7 +126,7 @@ export async function loginStudentHandler(
       reply,
     });
 
-    if (!accessToken)
+    if (_.isEmpty(accessToken))
       return reply.code(401).send({ message: "Invalid matNumber or password" });
 
     return reply.code(201).send({
@@ -239,7 +239,7 @@ export async function loginHandler(
       reply,
     });
 
-    if (!accessToken)
+    if (_.isEmpty(accessToken))
       return reply
         .code(401)
         .send({ success: false, message: "Invalid email or password" });
