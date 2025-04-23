@@ -19,7 +19,7 @@ import {
 } from "./user.service";
 import { decrypt, verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
-import { generateRandomCode } from "../../utils";
+import { generateRandomCode, sendResetEmail } from "../../utils";
 import _ from "lodash";
 
 interface LoginType {
@@ -339,6 +339,8 @@ export async function forgotPasswordHandler(
         .send({ success: false, message: "User not found." });
 
     const code = generateRandomCode();
+
+    sendResetEmail(email, code);
 
     const expiresAt = new Date(Date.now() + 1000 * 60 * 20);
 

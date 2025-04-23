@@ -18,6 +18,7 @@ import {
   regAdminHandler,
   regLecturerHandler,
   regStudentHandler,
+  resetPasswordHandler,
   verifyResetCodeHandler,
 } from "./user.controller";
 
@@ -140,7 +141,7 @@ const changePasswordRoutes: RouteConfig[] = [
   {
     method: "post",
     url: "/reset-password",
-    handler: forgotPasswordHandler,
+    handler: resetPasswordHandler,
     schema: {
       response: {
         201: otherResponse,

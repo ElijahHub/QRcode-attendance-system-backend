@@ -13,3 +13,30 @@ export async function createSession(
     }),
   });
 }
+export async function findSessionsByCourseAndDate({
+  courseId,
+  start,
+  end,
+}: {
+  courseId: string;
+  start: Date;
+  end: Date;
+}) {
+  return await prisma.lectureSessions.findFirst({
+    where: {
+      courseId,
+      createdAt: {
+        gte: start,
+        lte: end,
+      },
+    },
+  });
+}
+
+export async function findCourseById(id: string) {
+  return await prisma.course.findUnique({
+    where: {
+      id,
+    },
+  });
+}
