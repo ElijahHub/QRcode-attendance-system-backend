@@ -1,9 +1,14 @@
 import { FastifyInstance } from "fastify";
 import { RouteConfig } from "../../types";
-import { scanQrCodeHandler } from "./attendance.controller";
+import {
+  getAllStudentAttendanceHandler,
+  getAttendanceForAStudentHandler,
+  getStudentAttendanceForSessionHandler,
+  scanQrCodeHandler,
+} from "./attendance.controller";
 import { scanData } from "./attendance.schema";
 
-const seRoutes: RouteConfig[] = [
+const allRoutes: RouteConfig[] = [
   {
     method: "post",
     url: "/",
@@ -12,16 +17,42 @@ const seRoutes: RouteConfig[] = [
       body: scanData,
     },
   },
+
+  {
+    method: "get",
+    url: "/student/:courseCode",
+    handler: getAttendanceForAStudentHandler,
+    schema: {},
+  },
+
+  {
+    method: "get",
+    url: "/:courseCode/all",
+    handler: getAllStudentAttendanceHandler,
+    schema: {},
+    preHandler: "lecturer",
+  },
+
+  {
+    method: "get",
+    url: "/:sessionId",
+    handler: getStudentAttendanceForSessionHandler,
+    schema: {},
+    preHandler: "lecturer",
+  },
 ];
 
 export default async function attendanceRoutes(server: FastifyInstance) {
-  seRoutes.forEach((route) => {
+  allRoutes.forEach((route) => {
     server.route({
       method: route.method,
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: [server.authenticate, server.authorize(["STUDENT"])],
+      preHandler:
+        route.preHandler === "lecturer"
+          ? [server.authenticate, server.authorize(["LECTURER"])]
+          : [server.authenticate, server.authorize(["STUDENT"])],
     });
   });
 }

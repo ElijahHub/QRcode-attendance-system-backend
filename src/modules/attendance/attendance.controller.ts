@@ -1,13 +1,17 @@
-import { FastifyReply, FastifyRequest } from "fastify";
 import _ from "lodash";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { ScanData } from "./attendance.schema";
 import {
   createAttendanceRecord,
   findAttendanceRecord,
   findSessionById,
+  getAllStudentAttendance,
+  getAttendanceForAStudent,
+  getStudentAttendanceForSession,
 } from "./attendance.service";
 import { validateProximity } from "../../utils";
 import { decrypt } from "../../utils/auth";
+import { findCourseByCourseCode } from "../course/course.service";
 
 export async function scanQrCodeHandler(
   req: FastifyRequest<{
@@ -82,8 +86,90 @@ export async function scanQrCodeHandler(
   }
 }
 
-//TODO: GET ATTENDANCE RECORD FOR A PARTICULAR COURSE
+// GET ATTENDANCE RECORD FOR A PARTICULAR COURSE
+export async function getAllStudentAttendanceHandler(
+  req: FastifyRequest<{
+    Params: { courseCode: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { courseCode } = req.params;
+    const course = await findCourseByCourseCode(_.toUpper(courseCode));
 
-//TODO: GET ATTENDANCE RECORD FOR A PARTICULAR COURSE FOR A SESSION
+    if (_.isEmpty(course))
+      return reply
+        .code(404)
+        .send({ success: false, message: "Course Not Found" });
+
+    const attendance = await getAllStudentAttendance(course.id);
+
+    return reply.code(200).send({
+      success: true,
+      data: attendance,
+    });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
+  }
+}
+
+//GET ATTENDANCE RECORD FOR A PARTICULAR COURSE FOR A SESSION
+export async function getStudentAttendanceForSessionHandler(
+  req: FastifyRequest<{
+    Params: { sessionId: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { sessionId } = req.params;
+
+    const attendance = await getStudentAttendanceForSession(sessionId);
+
+    if (_.isEmpty(attendance))
+      return reply
+        .code(404)
+        .send({ success: false, message: "Session Not Found" });
+
+    return reply.code(200).send({ success: true, data: attendance });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
+  }
+}
 
 //TODO: GET ATTENDANCE RECORD FOR A PARTICULAR STUDENT ON A PARTICULAR COURSE
+export async function getAttendanceForAStudentHandler(
+  req: FastifyRequest<{
+    Params: { courseCode: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { _id } = req.user as { _id: string };
+    const { courseCode } = req.params;
+
+    const course = await findCourseByCourseCode(_.toUpper(courseCode));
+
+    if (_.isEmpty(course))
+      return reply
+        .code(404)
+        .send({ success: false, message: "Course Not Found" });
+
+    const attendance = await getAttendanceForAStudent({
+      studentId: _id,
+      courseId: course.id,
+    });
+
+    return reply.code(200).send({
+      success: true,
+      data: _.merge({}, attendance, { course: course.courseCode }),
+    });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong " });
+  }
+}

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import prisma from "../../utils/prisma";
 import { CreateAttendanceInput } from "./attendance.schema";
+import { decrypt } from "../../utils/auth";
 
 export async function createAttendanceRecord(input: CreateAttendanceInput) {
   return await prisma.attendanceRecords.create({
@@ -32,8 +33,8 @@ export async function getStudentAttendanceForSession(sessionId: string) {
 
   return _.map(attendance, (record) => ({
     date: record.timestamp,
-    matNumber: record.student.matNumber,
-    name: record.student.name,
+    matNumber: decrypt(record.student.matNumber as string),
+    name: decrypt(record.student.name),
   }));
 }
 
@@ -46,8 +47,8 @@ export async function getAllStudentAttendance(courseId: string) {
   const allAttendance = _.flatMap(sessions, (session) =>
     _.map(session.attendance, (record) => ({
       date: record.timestamp,
-      matNumber: record.student.matNumber,
-      name: record.student.name,
+      matNumber: decrypt(record.student.matNumber as string),
+      name: decrypt(record.student.name),
     }))
   );
 
