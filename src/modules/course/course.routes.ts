@@ -5,6 +5,8 @@ import {
   createCourseHandler,
   deleteCourseHandler,
   deleteLecturerFromCourseHandler,
+  getAllCourseHandler,
+  getSpecificCourse,
   updateCourseDetailsHandler,
 } from "./course.controller";
 import {
@@ -70,6 +72,20 @@ const courseRoutes: RouteConfig[] = [
         201: otherResponse,
       },
     },
+  },
+
+  {
+    method: "get",
+    url: "/",
+    handler: getAllCourseHandler,
+    schema: {},
+  },
+
+  {
+    method: "get",
+    url: "/:courseCode",
+    handler: getSpecificCourse,
+    schema: {},
   },
 ];
 

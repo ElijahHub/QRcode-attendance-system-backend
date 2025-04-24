@@ -42,6 +42,13 @@ export async function findCourseById(courseId: string) {
 export async function findCourseByCourseCode(courseCode: string) {
   return await prisma.course.findUnique({
     where: { courseCode: _.toUpper(courseCode) },
+    select: {
+      id: true,
+      courseCode: true,
+      courseName: true,
+      description: true,
+      lecturers: true,
+    },
   });
 }
 
@@ -82,5 +89,17 @@ export async function deleteLecturerFromCourse(
 export async function deleteCourse(courseId: string) {
   return await prisma.course.delete({
     where: { id: courseId },
+  });
+}
+
+export async function getAllCourse() {
+  return await prisma.course.findMany({
+    select: {
+      id: true,
+      courseCode: true,
+      courseName: true,
+      description: true,
+      lecturers: true,
+    },
   });
 }
