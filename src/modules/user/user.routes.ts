@@ -13,6 +13,9 @@ import {
   changePasswordHandler,
   deleteUserHandler,
   forgotPasswordHandler,
+  getAllLecturerHandler,
+  getAllStudentHandler,
+  getSpecificUserHandler,
   loginHandler,
   loginStudentHandler,
   regAdminHandler,
@@ -153,7 +156,7 @@ const changePasswordRoutes: RouteConfig[] = [
 const deleteUserRoutes: RouteConfig[] = [
   {
     method: "delete",
-    url: "/users/:id",
+    url: "/:id",
     handler: deleteUserHandler,
     schema: {
       response: {
@@ -161,6 +164,29 @@ const deleteUserRoutes: RouteConfig[] = [
       },
     },
     preHandler: true,
+  },
+];
+
+const getUserRoutes: RouteConfig[] = [
+  {
+    method: "get",
+    url: "/lecturer",
+    handler: getAllLecturerHandler,
+    schema: {},
+    preHandler: true,
+  },
+  {
+    method: "get",
+    url: "/student",
+    handler: getAllStudentHandler,
+    schema: {},
+    preHandler: true,
+  },
+  {
+    method: "get",
+    url: "/:id",
+    handler: getSpecificUserHandler,
+    schema: {},
   },
 ];
 

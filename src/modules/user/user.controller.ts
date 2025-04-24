@@ -13,6 +13,8 @@ import {
   createPasswordReset,
   createUser,
   deleteUser,
+  findLecturer,
+  findStudent,
   findUserById,
   findUserByMatNumber,
   findUserEmail,
@@ -105,7 +107,7 @@ export async function regStudentHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong ", error });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -138,7 +140,7 @@ export async function loginStudentHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong ", error });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -178,7 +180,7 @@ export async function regLecturerHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong ", error });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -218,7 +220,7 @@ export async function regAdminHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong ", error });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -253,7 +255,7 @@ export async function loginHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong ", error });
+      .send({ success: false, message: "Something went wrong " });
   }
 }
 
@@ -275,7 +277,7 @@ export async function changePasswordHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Failed to update password", error });
+      .send({ success: false, message: "Failed to update password" });
   }
 }
 
@@ -344,9 +346,7 @@ export async function forgotPasswordHandler(
       .code(201)
       .send({ success: true, message: "Reset code sent to email" });
   } catch (error) {
-    reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong", error });
+    reply.code(500).send({ success: false, message: "Something went wrong" });
   }
 }
 
@@ -381,7 +381,7 @@ export async function verifyResetCodeHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong", error });
+      .send({ success: false, message: "Something went wrong" });
   }
 }
 
@@ -422,6 +422,75 @@ export async function resetPasswordHandler(
   } catch (error) {
     return reply
       .code(500)
-      .send({ success: false, message: "Something went wrong", error });
+      .send({ success: false, message: "Something went wrong" });
+  }
+}
+
+//* GET ALL STUDENT HANDLER
+export async function getAllStudentHandler(reply: FastifyReply) {
+  try {
+    const student = await findStudent();
+
+    const studentData = _.map(student, (data) => ({
+      id: data.id,
+      matNumber: decrypt(data.matNumber as string),
+      name: decrypt(data.name),
+      email: decrypt(data.email),
+    }));
+
+    return reply.code(200).send({ success: true, data: studentData });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong" });
+  }
+}
+//* GET ALL LECTURER HANDLER
+export async function getAllLecturerHandler(reply: FastifyReply) {
+  try {
+    const lecturer = await findLecturer();
+
+    const lectureData = _.map(lecturer, (data) => ({
+      id: data.id,
+      name: decrypt(data.name),
+      email: decrypt(data.email),
+    }));
+
+    return reply.code(200).send({ success: true, data: lectureData });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong" });
+  }
+}
+//* GET SPECIFIC USER
+export async function getSpecificUserHandler(
+  req: FastifyRequest<{
+    Params: { id: string };
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { id } = req.params;
+    const user = await findUserById(id);
+
+    if (_.isEmpty(user))
+      return reply
+        .code(404)
+        .send({ success: false, message: "User not found." });
+
+    const userData = {
+      id: user.id,
+      matNumber: user.matNumber ? decrypt(user.matNumber) : "",
+      name: decrypt(user.name),
+      email: decrypt(user.name),
+      role: user.role,
+    };
+
+    return reply.code(200).send({ success: true, data: userData });
+  } catch (error) {
+    return reply
+      .code(500)
+      .send({ success: false, message: "Something went wrong" });
   }
 }

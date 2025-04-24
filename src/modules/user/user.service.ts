@@ -73,14 +73,33 @@ export async function findUserEmail(email: string) {
 export async function findUserById(id: string) {
   return await prisma.user.findUnique({
     where: { id: id },
-  });
-}
-
-export async function findUsers() {
-  return await prisma.user.findMany({
     select: {
       id: true,
       matNumber: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+  });
+}
+
+export async function findStudent() {
+  return await prisma.user.findMany({
+    where: { role: "STUDENT" },
+    select: {
+      id: true,
+      matNumber: true,
+      name: true,
+      email: true,
+    },
+  });
+}
+
+export async function findLecturer() {
+  return await prisma.user.findMany({
+    where: { role: "LECTURER" },
+    select: {
+      id: true,
       name: true,
       email: true,
     },
