@@ -3,7 +3,6 @@ import zodToJsonSchema from "zod-to-json-schema";
 
 const createSessionSchema = z.object({
   courseId: z.string().uuid("Invalid id format"),
-  expiresAt: z.date(),
   geolocationData: z.object({
     latitude: z.number(),
     longitude: z.number(),

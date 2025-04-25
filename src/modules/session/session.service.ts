@@ -3,7 +3,7 @@ import prisma from "../../utils/prisma";
 import { CreateSessionInput } from "./session.schema";
 
 export async function createSession(
-  input: CreateSessionInput & { lecturerId: string }
+  input: CreateSessionInput & { lecturerId: string; expiresAt: Date }
 ) {
   const { expiresAt, geolocationData, ...rest } = input;
   return await prisma.lectureSessions.create({

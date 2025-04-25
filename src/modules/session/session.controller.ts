@@ -47,8 +47,10 @@ export async function createSessionHandler(
       });
     }
 
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
     const { id } = await createSession(
-      _.merge({}, body, { lecturerId: user._id })
+      _.merge({}, body, { lecturerId: user._id, expiresAt })
     );
 
     const qrPayload = {
