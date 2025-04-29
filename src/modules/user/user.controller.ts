@@ -22,7 +22,7 @@ import {
 } from "./user.service";
 import { decrypt, verifyPassword } from "../../utils/auth";
 import { COOKIE_DOMAIN } from "../../config";
-import { generateRandomCode, sendResetEmail } from "../../utils";
+import { generateRandomCode, maskEmail, sendResetEmail } from "../../utils";
 import { LoginType } from "../../types";
 
 //* USER LOGIN HELPER FUNCTION
@@ -336,15 +336,23 @@ export async function forgotPasswordHandler(
 
     const code = generateRandomCode();
 
-    sendResetEmail(email, code);
+    sendResetEmail({
+      to: email,
+      code,
+    });
 
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 20);
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
 
     await createPasswordReset({ code, email, expiresAt });
 
+    const maskedEmail = maskEmail(email);
+
     return reply
       .code(201)
-      .send({ success: true, message: "Reset code sent to email" });
+      .send({
+        success: true,
+        message: `A reset code has been sent to ${maskedEmail}`,
+      });
   } catch (error) {
     reply.code(500).send({ success: false, message: "Something went wrong" });
   }
