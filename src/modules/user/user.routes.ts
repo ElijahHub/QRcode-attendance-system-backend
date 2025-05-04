@@ -30,7 +30,7 @@ import type { RouteConfig } from "../../types";
 const studentRoutes: RouteConfig[] = [
   {
     method: "post",
-    url: "/student",
+    url: "/students",
     handler: regStudentHandler,
     schema: {
       body: createUser,
@@ -42,7 +42,7 @@ const studentRoutes: RouteConfig[] = [
 
   {
     method: "post",
-    url: "/student/login",
+    url: "/students/login",
     handler: loginStudentHandler,
     schema: {
       body: loginStudent,
@@ -56,7 +56,7 @@ const studentRoutes: RouteConfig[] = [
 const lecturerRoutes: RouteConfig[] = [
   {
     method: "post",
-    url: "/lecturer",
+    url: "/lecturers",
     handler: regLecturerHandler,
     schema: {
       body: createUserWithoutPass,
@@ -69,7 +69,7 @@ const lecturerRoutes: RouteConfig[] = [
 
   {
     method: "post",
-    url: "/lecturer/login",
+    url: "/lecturers/login",
     handler: loginHandler,
     schema: {
       body: loginLecturer,
@@ -156,7 +156,7 @@ const changePasswordRoutes: RouteConfig[] = [
 const deleteUserRoutes: RouteConfig[] = [
   {
     method: "delete",
-    url: "/:id",
+    url: "user/:id",
     handler: deleteUserHandler,
     schema: {
       response: {
@@ -170,21 +170,21 @@ const deleteUserRoutes: RouteConfig[] = [
 const getUserRoutes: RouteConfig[] = [
   {
     method: "get",
-    url: "/lecturer",
+    url: "/lecturers",
     handler: getAllLecturerHandler,
     schema: {},
     preHandler: true,
   },
   {
     method: "get",
-    url: "/student",
+    url: "/students",
     handler: getAllStudentHandler,
     schema: {},
     preHandler: true,
   },
   {
     method: "get",
-    url: "/:id",
+    url: "user/:id",
     handler: getSpecificUserHandler,
     schema: {},
   },
@@ -196,6 +196,7 @@ const allUserRoutes: RouteConfig[] = [
   ...adminRoutes,
   ...changePasswordRoutes,
   ...deleteUserRoutes,
+  ...getUserRoutes,
 ];
 
 export default async function userRoutes(server: FastifyInstance) {

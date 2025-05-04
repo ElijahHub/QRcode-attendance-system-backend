@@ -53,11 +53,13 @@ async function loginUser({ identifier, password, type, reply }: LoginType) {
     });
   }
 
+  console.log(user.email);
+
   //? ACCESS TOKEN REGISTRATION
   const accessToken = await reply.jwtSign({
     _id: user.id,
-    email: user.email,
-    matNumber: user.matNumber,
+    email: decrypt(user.email),
+    matNumber: user.matNumber ? decrypt(user.matNumber) : "",
     role: user.role,
   });
 
@@ -171,11 +173,10 @@ export async function regLecturerHandler(
 
     return reply.code(201).send({
       success: true,
-      data: _.merge({}, rest, {
+      data: {
         name: decrypt(name),
-        matNumber: matNumber && decrypt(matNumber),
         email: decrypt(email),
-      }),
+      },
     });
   } catch (error) {
     return reply
@@ -253,6 +254,7 @@ export async function loginHandler(
       },
     });
   } catch (error) {
+    console.log(error);
     return reply
       .code(500)
       .send({ success: false, message: "Something went wrong " });
@@ -347,12 +349,10 @@ export async function forgotPasswordHandler(
 
     const maskedEmail = maskEmail(email);
 
-    return reply
-      .code(201)
-      .send({
-        success: true,
-        message: `A reset code has been sent to ${maskedEmail}`,
-      });
+    return reply.code(201).send({
+      success: true,
+      message: `A reset code has been sent to ${maskedEmail}`,
+    });
   } catch (error) {
     reply.code(500).send({ success: false, message: "Something went wrong" });
   }

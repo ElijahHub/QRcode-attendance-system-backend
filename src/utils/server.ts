@@ -88,7 +88,7 @@ export default function server() {
     return { status: "OK" };
   });
 
-  app.register(userRoutes, { prefix: "api/v1/user" });
+  app.register(userRoutes, { prefix: "api/v1" });
   app.register(coursesRoutes, { prefix: "api/v1/courses" });
   app.register(sessionRoutes, { prefix: "api/v1/session" });
   app.register(attendanceRoutes, { prefix: "api/v1/attendance" });
