@@ -11,7 +11,6 @@ import {
   getAllCourse,
   updateCourseDetails,
 } from "./course.service";
-import { decrypt } from "../../utils/auth";
 
 // Create course handler
 export async function createCourseHandler(
@@ -35,7 +34,7 @@ export async function createCourseHandler(
     return reply.code(201).send({
       success: true,
       data: _.merge({}, course, {
-        lecturerIds: course?.lecturers.map((lect) => lect.id),
+        lecturersId: course?.lecturers.map((lect) => lect.id),
       }),
     });
   } catch (error) {
@@ -72,9 +71,12 @@ export async function updateCourseDetailsHandler(
         message: "A course with this course code already exist",
       });
 
-    const updated = await updateCourseDetails(id, body);
+    const { lecturers, ...rest } = await updateCourseDetails(id, body);
 
-    return reply.send({ success: true, data: updated });
+    return reply.send({
+      success: true,
+      data: _.merge({}, rest, { lecturersId: lecturers.map((lec) => lec.id) }),
+    });
   } catch (error) {
     return reply.code(500).send({ success: false, message: "Update failed" });
   }
@@ -98,16 +100,10 @@ export async function addLecturerToCourseHandler(
         .code(404)
         .send({ success: false, message: "Course not found." });
 
-    const { lecturers, ...updated } = await addLecturerToCourse(
-      id,
-      lecturerIds
-    );
-
+    const { lecturers, ...rest } = await addLecturerToCourse(id, lecturerIds);
     return reply.send({
       success: true,
-      data: _.merge({}, updated, {
-        lecturerIds: lecturers.map((lect) => lect.id),
-      }),
+      data: _.merge({}, rest, { lecturersId: lecturers.map((lec) => lec.id) }),
     });
   } catch (error) {
     return reply
@@ -134,9 +130,15 @@ export async function deleteLecturerFromCourseHandler(
         .code(404)
         .send({ success: false, message: "Course not found." });
 
-    const updated = deleteLecturerFromCourse(id, lecturerId);
+    const { lecturers, ...rest } = await deleteLecturerFromCourse(
+      id,
+      lecturerId
+    );
 
-    return reply.send({ success: true, data: updated });
+    return reply.send({
+      success: true,
+      data: _.merge({}, rest, { lecturersId: lecturers.map((lec) => lec.id) }),
+    });
   } catch (error) {
     return reply
       .code(500)
@@ -174,7 +176,10 @@ export async function deleteCourseHandler(
 }
 
 // Get all course
-export async function getAllCourseHandler(reply: FastifyReply) {
+export async function getAllCourseHandler(
+  req: FastifyRequest,
+  reply: FastifyReply
+) {
   try {
     const course = await getAllCourse();
 
@@ -183,10 +188,7 @@ export async function getAllCourseHandler(reply: FastifyReply) {
       courseCode: data.courseCode,
       courseName: data.courseName,
       description: data.description,
-      lecturers: _.map(data.lecturers, (lec) => ({
-        id: lec.id,
-        name: decrypt(lec.name),
-      })),
+      lecturersId: _.map(data.lecturers, (lec) => lec.id),
     }));
 
     return reply.code(200).send({ success: true, data: courseData });
@@ -218,10 +220,7 @@ export async function getSpecificCourse(
       courseCode: course.courseCode,
       courseName: course.courseName,
       description: course.description,
-      lecturers: _.map(course.lecturers, (lec) => ({
-        id: lec.id,
-        name: decrypt(lec.name),
-      })),
+      lecturersId: _.map(course.lecturers, (lec) => lec.id),
     };
 
     return reply.code(200).send({ success: true, data: courseData });

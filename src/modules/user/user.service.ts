@@ -49,8 +49,8 @@ export async function updateUserDetails(
     where: { id },
     data: {
       name: encrypt(structureName(name)),
-      matNumber: matNumber ? encrypt(upperMatNumber) : null,
-      matNumberMac: matNumber ? generateHmac(upperMatNumber) : null,
+      matNumber: matNumber && encrypt(upperMatNumber),
+      matNumberMac: matNumber && generateHmac(upperMatNumber),
       email: encrypt(lowerEmail),
       emailMac: generateHmac(lowerEmail),
     },

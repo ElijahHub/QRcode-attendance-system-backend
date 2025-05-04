@@ -93,13 +93,14 @@ export async function regStudentHandler(
       }
     }
 
-    const { name, matNumber, email } = await createUser(
+    const { name, matNumber, email, id } = await createUser(
       _.merge({}, body, { mustChangePassword: false })
     );
 
     return reply.code(201).send({
       success: true,
       data: {
+        id: id,
         name: decrypt(name),
         matNumber: matNumber && decrypt(matNumber),
         email: decrypt(email),
@@ -162,7 +163,7 @@ export async function regLecturerHandler(
       });
     }
 
-    const { name, email } = await createUser(
+    const { name, email, id } = await createUser(
       _.merge({}, body, {
         password: "000000",
         confirmPassword: "000000",
@@ -173,6 +174,7 @@ export async function regLecturerHandler(
     return reply.code(201).send({
       success: true,
       data: {
+        id: id,
         name: decrypt(name),
         email: decrypt(email),
       },
@@ -201,7 +203,7 @@ export async function regAdminHandler(
       });
     }
 
-    const { name, email } = await createUser(
+    const { name, email, id } = await createUser(
       _.merge({}, body, {
         password: "000000",
         confirmPassword: "000000",
@@ -212,6 +214,7 @@ export async function regAdminHandler(
     return reply.code(201).send({
       success: true,
       data: {
+        id: id,
         name: decrypt(name),
         email: decrypt(email),
       },
@@ -432,7 +435,10 @@ export async function resetPasswordHandler(
 }
 
 //* GET ALL STUDENT HANDLER
-export async function getAllStudentHandler(reply: FastifyReply) {
+export async function getAllStudentHandler(
+  req: FastifyRequest,
+  reply: FastifyReply
+) {
   try {
     const student = await findStudent();
 
@@ -451,7 +457,10 @@ export async function getAllStudentHandler(reply: FastifyReply) {
   }
 }
 //* GET ALL LECTURER HANDLER
-export async function getAllLecturerHandler(reply: FastifyReply) {
+export async function getAllLecturerHandler(
+  req: FastifyRequest,
+  reply: FastifyReply
+) {
   try {
     const lecturer = await findLecturer();
 
@@ -512,7 +521,7 @@ export async function updateUserDetailsHandler(
     const { id } = req.params;
     const { email, name, matNumber } = req.body;
 
-    const user = findUserById(id);
+    const user = await findUserById(id);
 
     if (_.isEmpty(user))
       return reply
@@ -520,8 +529,9 @@ export async function updateUserDetailsHandler(
         .send({ success: false, message: "User not found." });
 
     const emailExist = await findUserEmail(email);
+    const checkEmail = _.isEqual(decrypt(user.email), email);
 
-    if (emailExist)
+    if (!checkEmail && emailExist)
       return reply.code(409).send({
         success: false,
         message: "A user with this email already exist",
@@ -529,8 +539,12 @@ export async function updateUserDetailsHandler(
 
     if (matNumber) {
       const matNumberExist = await findUserByMatNumber(matNumber);
+      const checkMatNumber = _.isEqual(
+        decrypt(user.matNumber as string),
+        matNumber
+      );
 
-      if (matNumberExist)
+      if (!checkMatNumber && matNumberExist)
         return reply.code(409).send({
           success: false,
           message: "A user with this matNumber already exist",
@@ -546,6 +560,7 @@ export async function updateUserDetailsHandler(
     return reply.send({
       success: true,
       data: {
+        id: id,
         name: decrypt(updated.name),
         matNumber: updated.matNumber && decrypt(updated.matNumber),
         email: decrypt(updated.email),

@@ -30,6 +30,16 @@ export async function updateCourseDetails(
       courseCode: _.toUpper(courseCode),
       ...rest,
     },
+    select: {
+      courseCode: true,
+      courseName: true,
+      description: true,
+      lecturers: {
+        select: {
+          id: true,
+        },
+      },
+    },
   });
 }
 
@@ -47,7 +57,11 @@ export async function findCourseByCourseCode(courseCode: string) {
       courseCode: true,
       courseName: true,
       description: true,
-      lecturers: true,
+      lecturers: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 }
@@ -63,8 +77,15 @@ export async function addLecturerToCourse(
         connect: lecturerIds.map((id) => ({ id })),
       },
     },
-    include: {
-      lecturers: true,
+    select: {
+      courseCode: true,
+      courseName: true,
+      description: true,
+      lecturers: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 }
@@ -80,8 +101,15 @@ export async function deleteLecturerFromCourse(
         disconnect: { id: lecturerId },
       },
     },
-    include: {
-      lecturers: true,
+    select: {
+      courseCode: true,
+      courseName: true,
+      description: true,
+      lecturers: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 }
@@ -99,7 +127,11 @@ export async function getAllCourse() {
       courseCode: true,
       courseName: true,
       description: true,
-      lecturers: true,
+      lecturers: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 }
