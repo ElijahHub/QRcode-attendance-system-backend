@@ -22,6 +22,7 @@ import {
   regLecturerHandler,
   regStudentHandler,
   resetPasswordHandler,
+  updateUserDetailsHandler,
   verifyResetCodeHandler,
 } from "./user.controller";
 
@@ -190,6 +191,16 @@ const getUserRoutes: RouteConfig[] = [
   },
 ];
 
+const updateUserRoutes: RouteConfig[] = [
+  {
+    method: "patch",
+    url: "/user/update/:id",
+    handler: updateUserDetailsHandler,
+    schema: {},
+    preHandler: true,
+  },
+];
+
 const allUserRoutes: RouteConfig[] = [
   ...studentRoutes,
   ...lecturerRoutes,
@@ -197,6 +208,7 @@ const allUserRoutes: RouteConfig[] = [
   ...changePasswordRoutes,
   ...deleteUserRoutes,
   ...getUserRoutes,
+  ...updateUserRoutes,
 ];
 
 export default async function userRoutes(server: FastifyInstance) {

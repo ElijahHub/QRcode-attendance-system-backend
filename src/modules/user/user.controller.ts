@@ -18,6 +18,7 @@ import {
   findUserById,
   findUserByMatNumber,
   findUserEmail,
+  updateUserDetails,
   verifyResetCode,
 } from "./user.service";
 import { decrypt, verifyPassword } from "../../utils/auth";
@@ -52,8 +53,6 @@ async function loginUser({ identifier, password, type, reply }: LoginType) {
       userId: user.id,
     });
   }
-
-  console.log(user.email);
 
   //? ACCESS TOKEN REGISTRATION
   const accessToken = await reply.jwtSign({
@@ -94,17 +93,17 @@ export async function regStudentHandler(
       }
     }
 
-    const { name, matNumber, email, ...rest } = await createUser(
+    const { name, matNumber, email } = await createUser(
       _.merge({}, body, { mustChangePassword: false })
     );
 
     return reply.code(201).send({
       success: true,
-      data: _.merge({}, rest, {
+      data: {
         name: decrypt(name),
         matNumber: matNumber && decrypt(matNumber),
         email: decrypt(email),
-      }),
+      },
     });
   } catch (error) {
     return reply
@@ -163,7 +162,7 @@ export async function regLecturerHandler(
       });
     }
 
-    const { name, matNumber, email, ...rest } = await createUser(
+    const { name, email } = await createUser(
       _.merge({}, body, {
         password: "000000",
         confirmPassword: "000000",
@@ -202,7 +201,7 @@ export async function regAdminHandler(
       });
     }
 
-    const { name, matNumber, email, ...rest } = await createUser(
+    const { name, email } = await createUser(
       _.merge({}, body, {
         password: "000000",
         confirmPassword: "000000",
@@ -212,11 +211,10 @@ export async function regAdminHandler(
 
     return reply.code(201).send({
       success: true,
-      data: _.merge({}, rest, {
+      data: {
         name: decrypt(name),
-        matNumber: matNumber && decrypt(matNumber),
         email: decrypt(email),
-      }),
+      },
     });
   } catch (error) {
     return reply
@@ -254,7 +252,6 @@ export async function loginHandler(
       },
     });
   } catch (error) {
-    console.log(error);
     return reply
       .code(500)
       .send({ success: false, message: "Something went wrong " });
@@ -500,5 +497,61 @@ export async function getSpecificUserHandler(
     return reply
       .code(500)
       .send({ success: false, message: "Something went wrong" });
+  }
+}
+
+//* UPDATE USER
+export async function updateUserDetailsHandler(
+  req: FastifyRequest<{
+    Params: { id: string };
+    Body: CreateUserWithOutPass;
+  }>,
+  reply: FastifyReply
+) {
+  try {
+    const { id } = req.params;
+    const { email, name, matNumber } = req.body;
+
+    const user = findUserById(id);
+
+    if (_.isEmpty(user))
+      return reply
+        .code(404)
+        .send({ success: false, message: "User not found." });
+
+    const emailExist = await findUserEmail(email);
+
+    if (emailExist)
+      return reply.code(409).send({
+        success: false,
+        message: "A user with this email already exist",
+      });
+
+    if (matNumber) {
+      const matNumberExist = await findUserByMatNumber(matNumber);
+
+      if (matNumberExist)
+        return reply.code(409).send({
+          success: false,
+          message: "A user with this matNumber already exist",
+        });
+    }
+
+    const updated = await updateUserDetails(id, {
+      name,
+      matNumber,
+      email,
+    });
+
+    return reply.send({
+      success: true,
+      data: {
+        name: decrypt(updated.name),
+        matNumber: updated.matNumber && decrypt(updated.matNumber),
+        email: decrypt(updated.email),
+      },
+    });
+  } catch (error) {
+    return reply.code(500).send({ success: false, message: "Update failed" });
   }
 }

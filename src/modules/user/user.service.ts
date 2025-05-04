@@ -6,6 +6,7 @@ import {
   CreateUserInput,
   ChangePasswordInput,
   PasswordResetInput,
+  CreateUserWithOutPass,
 } from "./user.schema";
 
 const validatePasswordMatch = (password: string, confirmPassword: string) => {
@@ -31,6 +32,32 @@ export async function createUser(input: CreateUserInput) {
       emailMac: generateHmac(lowerEmail),
       password: hashedPassword,
       ...rest,
+    },
+  });
+}
+
+export async function updateUserDetails(
+  id: string,
+  input: CreateUserWithOutPass
+) {
+  const { name, email, matNumber } = input;
+
+  const upperMatNumber = _.toUpper(matNumber);
+  const lowerEmail = _.toLower(email);
+
+  return prisma.user.update({
+    where: { id },
+    data: {
+      name: encrypt(structureName(name)),
+      matNumber: matNumber ? encrypt(upperMatNumber) : null,
+      matNumberMac: matNumber ? generateHmac(upperMatNumber) : null,
+      email: encrypt(lowerEmail),
+      emailMac: generateHmac(lowerEmail),
+    },
+    select: {
+      name: true,
+      matNumber: true,
+      email: true,
     },
   });
 }

@@ -54,17 +54,18 @@ export async function updateCourseDetailsHandler(
   reply: FastifyReply
 ) {
   try {
-    console.log("passed");
     const { id } = req.params;
     const body = req.body;
 
     const course = await findCourseById(id);
+
     if (_.isEmpty(course))
       return reply
         .code(404)
         .send({ success: false, message: "Course not found." });
 
     const exist = await findCourseByCourseCode(body.courseCode);
+
     if (exist)
       return reply.code(409).send({
         success: false,
