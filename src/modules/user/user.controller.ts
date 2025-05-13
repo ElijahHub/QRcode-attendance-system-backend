@@ -107,9 +107,11 @@ export async function regStudentHandler(
       },
     });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong " });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong ",
+      details: error,
+    });
   }
 }
 
@@ -140,9 +142,11 @@ export async function loginStudentHandler(
       },
     });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong " });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong ",
+      details: error,
+    });
   }
 }
 
@@ -180,9 +184,11 @@ export async function regLecturerHandler(
       },
     });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong " });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong ",
+      details: error,
+    });
   }
 }
 
@@ -220,9 +226,11 @@ export async function regAdminHandler(
       },
     });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong " });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong ",
+      details: error,
+    });
   }
 }
 
@@ -255,9 +263,11 @@ export async function loginHandler(
       },
     });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong " });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong ",
+      details: error,
+    });
   }
 }
 
@@ -277,9 +287,11 @@ export async function changePasswordHandler(
       .code(201)
       .send({ success: true, message: "Password updated." });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Failed to update password" });
+    return reply.code(500).send({
+      success: false,
+      message: "Failed to update password",
+      details: error,
+    });
   }
 }
 
@@ -314,7 +326,7 @@ export async function deleteUserHandler(
     return reply.code(500).send({
       success: false,
       message: "Failed to delete user. Please try again later.",
-      error,
+      details: error,
     });
   }
 }
@@ -354,7 +366,11 @@ export async function forgotPasswordHandler(
       message: `A reset code has been sent to ${maskedEmail}`,
     });
   } catch (error) {
-    reply.code(500).send({ success: false, message: "Something went wrong" });
+    reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 
@@ -387,9 +403,11 @@ export async function verifyResetCodeHandler(
 
     return reply.code(201).send({ success: true, message: "Code verified" });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong" });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 
@@ -428,9 +446,11 @@ export async function resetPasswordHandler(
       .code(201)
       .send({ success: true, message: "Password reset successful" });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong" });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 
@@ -451,9 +471,11 @@ export async function getAllStudentHandler(
 
     return reply.code(200).send({ success: true, data: studentData });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong" });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 //* GET ALL LECTURER HANDLER
@@ -472,9 +494,11 @@ export async function getAllLecturerHandler(
 
     return reply.code(200).send({ success: true, data: lectureData });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong" });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 //* GET SPECIFIC USER
@@ -503,9 +527,11 @@ export async function getSpecificUserHandler(
 
     return reply.code(200).send({ success: true, data: userData });
   } catch (error) {
-    return reply
-      .code(500)
-      .send({ success: false, message: "Something went wrong" });
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong",
+      details: error,
+    });
   }
 }
 
@@ -567,6 +593,8 @@ export async function updateUserDetailsHandler(
       },
     });
   } catch (error) {
-    return reply.code(500).send({ success: false, message: "Update failed" });
+    return reply
+      .code(500)
+      .send({ success: false, message: "Update failed", details: error });
   }
 }
