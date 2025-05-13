@@ -13,7 +13,7 @@ async function main() {
   if (!existingAdmin) {
     await prisma.user.create({
       data: {
-        name: "Admin",
+        name: encrypt("Admin"),
         email: encrypt("admin@admin.com"),
         password: password,
         emailMac: generateHmac("admin@admin.com"),
