@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   // Check if default admin exists
   const existingAdmin = await prisma.user.findFirst({
-    where: { email: "admin@admin.com" },
+    where: { emailMac: generateHmac("admin@admin.com") },
   });
 
   const password = await genHash("123456789");
