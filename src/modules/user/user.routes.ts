@@ -185,7 +185,7 @@ const getUserRoutes: RouteConfig[] = [
   },
   {
     method: "get",
-    url: "user/:id",
+    url: "/user/:id",
     handler: getSpecificUserHandler,
     schema: {},
   },
