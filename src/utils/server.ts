@@ -22,7 +22,7 @@ export default function server() {
   //* CORS REGISTRATION
   app.register(cors, {
     origin: true,
-    credentials: true,
+   credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   });
