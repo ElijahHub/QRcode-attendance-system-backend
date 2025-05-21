@@ -58,6 +58,7 @@ async function loginUser({ identifier, password, type, reply }: LoginType) {
   const accessToken = await reply.jwtSign({
     _id: user.id,
     email: decrypt(user.email),
+    name: decrypt(user.name),
     matNumber: user.matNumber ? decrypt(user.matNumber) : "",
     role: user.role,
   });
