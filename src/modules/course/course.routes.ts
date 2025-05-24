@@ -85,6 +85,7 @@ const courseRoutes: RouteConfig[] = [
     url: "/",
     handler: getAllCourseHandler,
     schema: {},
+    preHandler: false,
   },
 
   {
@@ -92,6 +93,7 @@ const courseRoutes: RouteConfig[] = [
     url: "/:courseCode",
     handler: getSpecificCourse,
     schema: {},
+    preHandler: false,
   },
 ];
 
