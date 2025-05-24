@@ -15,6 +15,7 @@ import {
   createCourse,
   otherResponse,
 } from "./course.schema";
+import { prependListener } from "process";
 
 const courseRoutes: RouteConfig[] = [
   {
@@ -84,7 +85,6 @@ const courseRoutes: RouteConfig[] = [
     url: "/",
     handler: getAllCourseHandler,
     schema: {},
-    preHandler: false,
   },
 
   {
@@ -92,7 +92,6 @@ const courseRoutes: RouteConfig[] = [
     url: "/:courseCode",
     handler: getSpecificCourse,
     schema: {},
-    preHandler: false,
   },
 ];
 
@@ -103,10 +102,9 @@ export default async function coursesRoutes(server: FastifyInstance) {
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: route.preHandler && [
-        server.authenticate,
-        server.authorize(["ADMIN"]),
-      ],
+      preHandler: route.handler
+        ? [server.authenticate, server.authorize(["ADMIN"])]
+        : [],
     });
   });
 }
