@@ -25,14 +25,30 @@ export async function findSessionById(sessionId: string) {
   });
 }
 
-export async function getStudentAttendanceForSession(sessionId: string) {
+export async function getStudentAttendanceForSession(
+  courseId: string,
+  date: Date
+) {
+  const startDay = new Date(date);
+  startDay.setHours(0, 0, 0, 0);
+  const endDay = new Date(date);
+  endDay.setHours(23, 59, 59, 999);
+
   const attendance = await prisma.attendanceRecords.findMany({
-    where: { sessionId },
+    where: {
+      lecture: {
+        courseId,
+      },
+      createdAt: {
+        gte: startDay,
+        lte: endDay,
+      },
+    },
     include: { student: true },
   });
 
   return _.map(attendance, (record) => ({
-    date: record.timestamp,
+    date: record.createdAt,
     matNumber: decrypt(record.student.matNumber as string),
     name: decrypt(record.student.name),
   }));

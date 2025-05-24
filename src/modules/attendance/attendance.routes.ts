@@ -6,7 +6,10 @@ import {
   getStudentAttendanceForSessionHandler,
   scanQrCodeHandler,
 } from "./attendance.controller";
-import { scanData } from "./attendance.schema";
+import {
+  GetSessionsByCourseAndDateSchema,
+  scanData,
+} from "./attendance.schema";
 
 const allRoutes: RouteConfig[] = [
   {
@@ -35,9 +38,11 @@ const allRoutes: RouteConfig[] = [
 
   {
     method: "get",
-    url: "/:sessionId",
+    url: "/session",
     handler: getStudentAttendanceForSessionHandler,
-    schema: {},
+    schema: {
+      queryString: GetSessionsByCourseAndDateSchema,
+    },
     preHandler: "lecturer",
   },
 ];

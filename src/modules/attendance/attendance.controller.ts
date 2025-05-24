@@ -118,14 +118,24 @@ export async function getAllStudentAttendanceHandler(
 //GET ATTENDANCE RECORD FOR A PARTICULAR COURSE FOR A SESSION
 export async function getStudentAttendanceForSessionHandler(
   req: FastifyRequest<{
-    Params: { sessionId: string };
+    Querystring: { courseId: string; date: string };
   }>,
   reply: FastifyReply
 ) {
   try {
-    const { sessionId } = req.params;
+    const { courseId, date } = req.query;
 
-    const attendance = await getStudentAttendanceForSession(sessionId);
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return reply
+        .code(400)
+        .send({ success: false, message: "Invalid date format" });
+    }
+
+    const attendance = await getStudentAttendanceForSession(
+      courseId,
+      parsedDate
+    );
 
     if (_.isEmpty(attendance))
       return reply
