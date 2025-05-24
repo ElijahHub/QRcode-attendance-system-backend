@@ -27,6 +27,7 @@ const courseRoutes: RouteConfig[] = [
         201: createCourseResponse,
       },
     },
+    preHandler: true,
   },
 
   {
@@ -39,6 +40,7 @@ const courseRoutes: RouteConfig[] = [
         201: updateCourseDetails,
       },
     },
+    preHandler: true,
   },
 
   {
@@ -50,6 +52,7 @@ const courseRoutes: RouteConfig[] = [
         201: updateCourseDetails,
       },
     },
+    preHandler: true,
   },
 
   {
@@ -61,6 +64,7 @@ const courseRoutes: RouteConfig[] = [
         201: updateCourseDetails,
       },
     },
+    preHandler: true,
   },
 
   {
@@ -72,6 +76,7 @@ const courseRoutes: RouteConfig[] = [
         201: otherResponse,
       },
     },
+    preHandler: true,
   },
 
   {
@@ -79,6 +84,7 @@ const courseRoutes: RouteConfig[] = [
     url: "/",
     handler: getAllCourseHandler,
     schema: {},
+    preHandler: false,
   },
 
   {
@@ -86,6 +92,7 @@ const courseRoutes: RouteConfig[] = [
     url: "/:courseCode",
     handler: getSpecificCourse,
     schema: {},
+    preHandler: false,
   },
 ];
 
@@ -96,7 +103,10 @@ export default async function coursesRoutes(server: FastifyInstance) {
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: [server.authenticate, server.authorize(["ADMIN"])],
+      preHandler: route.preHandler && [
+        server.authenticate,
+        server.authorize(["ADMIN"]),
+      ],
     });
   });
 }
