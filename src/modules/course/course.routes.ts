@@ -104,7 +104,7 @@ export default async function coursesRoutes(server: FastifyInstance) {
       url: route.url,
       handler: route.handler,
       schema: route.schema,
-      preHandler: route.handler
+      preHandler: route.preHandler
         ? [server.authenticate, server.authorize(["ADMIN"])]
         : [],
     });
