@@ -70,7 +70,7 @@ interface MailOptions {
 export async function sendResetEmail({ to, code }: MailOptions) {
   try {
     const mailOptions: SendMailOptions = {
-      from: `"Your App Name" <${EMAIL_ACCOUNT}>`,
+      from: `"Afit Attendance App" <${EMAIL_ACCOUNT}>`,
       to: to,
       subject: "Your Password Reset Code",
       html: `
