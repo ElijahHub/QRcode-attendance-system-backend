@@ -7,11 +7,13 @@ const scanDataSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
   }),
+  deviceId: z.string().uuid("Invalid device ID format"),
 });
 
 const createAttendanceSchema = z.object({
   sessionId: z.string().uuid("Invalid id format"),
   studentId: z.string().uuid("Invalid id format"),
+  deviceId: z.string().uuid("Invalid device ID format"),
 });
 
 //Zod Schema to Json

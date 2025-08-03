@@ -4,6 +4,7 @@ import { ScanData } from "./attendance.schema";
 import {
   createAttendanceRecord,
   findAttendanceRecord,
+  findAttendanceRecordByDevice,
   findSessionById,
   getAllStudentAttendance,
   getAttendanceForAStudent,
@@ -56,6 +57,17 @@ export async function scanQrCodeHandler(
         message: "Invalid Location",
       });
 
+    const alreadyScanned = await findAttendanceRecordByDevice({
+      sessionId,
+      deviceId: body.deviceId,
+    });
+
+    if (alreadyScanned)
+      return reply.code(409).send({
+        success: false,
+        message: "Attendance Already Marked Using This Device",
+      });
+
     const alreadyMarked = await findAttendanceRecord({
       sessionId,
       studentId,
@@ -76,6 +88,7 @@ export async function scanQrCodeHandler(
     const record = await createAttendanceRecord({
       sessionId,
       studentId,
+      deviceId: body.deviceId,
     });
 
     return reply.code(201).send({ success: true, data: { record } });

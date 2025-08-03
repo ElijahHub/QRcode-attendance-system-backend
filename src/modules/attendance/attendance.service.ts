@@ -11,10 +11,28 @@ export async function createAttendanceRecord(input: CreateAttendanceInput) {
   });
 }
 
-export async function findAttendanceRecord(input: CreateAttendanceInput) {
+export async function findAttendanceRecord(input: {
+  sessionId: string;
+  studentId: string;
+}) {
   return await prisma.attendanceRecords.findFirst({
     where: {
       ...input,
+    },
+  });
+}
+
+export async function findAttendanceRecordByDevice({
+  sessionId,
+  deviceId,
+}: {
+  sessionId: string;
+  deviceId: string;
+}) {
+  return await prisma.attendanceRecords.findFirst({
+    where: {
+      sessionId,
+      deviceId,
     },
   });
 }
