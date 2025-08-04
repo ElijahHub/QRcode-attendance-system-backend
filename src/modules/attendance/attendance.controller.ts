@@ -51,12 +51,21 @@ export async function scanQrCodeHandler(
       radMeter: 1000,
     });
 
+    //Validate Location
     if (!location)
       return reply.code(401).send({
         success: false,
         message: "Invalid Location",
       });
 
+    // Check if the session is expired
+    if (new Date(Date.now()) > session.expiresAt)
+      return reply.code(401).send({
+        success: false,
+        message: "Session Expired",
+      });
+
+    // Check if the device has already scanned for this session
     const alreadyScanned = await findAttendanceRecordByDevice({
       sessionId,
       deviceId: body.deviceId,
@@ -68,6 +77,7 @@ export async function scanQrCodeHandler(
         message: "Attendance Already Marked Using This Device",
       });
 
+    // Check if the student has already marked attendance for this session
     const alreadyMarked = await findAttendanceRecord({
       sessionId,
       studentId,
@@ -79,12 +89,7 @@ export async function scanQrCodeHandler(
         message: "Attendance Already Marked",
       });
 
-    if (new Date(Date.now()) > session.expiresAt)
-      return reply.code(401).send({
-        success: false,
-        message: "Session Expired",
-      });
-
+    // Create Attendance Record
     const record = await createAttendanceRecord({
       sessionId,
       studentId,
