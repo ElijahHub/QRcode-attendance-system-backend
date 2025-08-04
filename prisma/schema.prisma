@@ -64,7 +64,7 @@ model AttendanceRecords {
   id String @id @default(uuid())
   sessionId String 
   studentId String 
-  deviceId  String 
+  deviceId String 
   timestamp DateTime @default(now())
   overrideFlag String?
 
