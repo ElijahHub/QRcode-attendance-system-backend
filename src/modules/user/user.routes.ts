@@ -157,7 +157,7 @@ const changePasswordRoutes: RouteConfig[] = [
 const deleteUserRoutes: RouteConfig[] = [
   {
     method: "delete",
-    url: "user/:id",
+    url: "/user/:id",
     handler: deleteUserHandler,
     schema: {
       response: {
