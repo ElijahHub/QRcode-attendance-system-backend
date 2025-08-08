@@ -14,36 +14,52 @@ import {
 
 // Create course handler
 export async function createCourseHandler(
-  req: FastifyRequest<{
-    Body: CreateCourseInput;
-  }>,
+  req: FastifyRequest<{ Body: CreateCourseInput }>,
   reply: FastifyReply
 ) {
-  try {
-    const { courseCode } = req.body;
+  const { lecturerIds } = req.body;
 
-    const exist = await findCourseByCourseCode(courseCode);
-    if (exist)
-      return reply.code(409).send({
+  try {
+    // Validate lecturerIds before DB
+    if (
+      !Array.isArray(lecturerIds) ||
+      lecturerIds.length === 0 ||
+      lecturerIds.some((id) => typeof id !== "string" || id.trim() === "")
+    ) {
+      return reply.code(400).send({
         success: false,
-        message: "A course with this course code already exist",
+        message:
+          "lecturerIds is required and must be a non-empty array of strings",
       });
+    }
 
     const course = await createCourse(req.body);
 
     return reply.code(201).send({
       success: true,
       data: _.merge({}, course, {
-        lecturersId: course?.lecturers.map((lect) => lect.id),
+        lecturersId: course.lecturers.map((lect) => lect.id),
       }),
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === "DUPLICATE_COURSE") {
+      return reply.code(409).send({
+        success: false,
+        message: "A course with this course code already exists",
+      });
+    }
+    if (error.message === "INVALID_LECTURERS") {
+      return reply.code(400).send({
+        success: false,
+        message: "One or more lecturer IDs are invalid",
+      });
+    }
+
     return reply
       .code(500)
       .send({ success: false, message: "Failed to create course" });
   }
 }
-
 // Update course details
 export async function updateCourseDetailsHandler(
   req: FastifyRequest<{

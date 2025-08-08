@@ -5,17 +5,36 @@ import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 export async function createCourse(input: CreateCourseInput) {
   const { courseCode, lecturerIds, ...rest } = input;
 
-  return await prisma.course.create({
-    data: {
-      courseCode: _.toUpper(courseCode),
-      ...rest,
-      lecturers: {
-        connect: lecturerIds.map((id) => ({ id })),
+  return await prisma.$transaction(async (tx) => {
+    // Duplicate check
+    const existing = await tx.course.findUnique({
+      where: { courseCode: _.toUpper(courseCode) },
+    });
+    if (existing) {
+      throw new Error("DUPLICATE_COURSE");
+    }
+
+    // Optional: verify lecturers exist
+    const lecturersExist = await tx.user.findMany({
+      where: { id: { in: lecturerIds } },
+      select: { id: true },
+    });
+
+    if (lecturersExist.length !== lecturerIds.length) {
+      throw new Error("INVALID_LECTURERS");
+    }
+
+    // Create course
+    return tx.course.create({
+      data: {
+        courseCode: _.toUpper(courseCode),
+        ...rest,
+        lecturers: {
+          connect: lecturerIds.map((id) => ({ id })),
+        },
       },
-    },
-    include: {
-      lecturers: true,
-    },
+      include: { lecturers: true },
+    });
   });
 }
 
