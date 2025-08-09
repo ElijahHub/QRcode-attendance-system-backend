@@ -65,7 +65,7 @@ export async function updateCourseDetailsHandler(
 
     const exist = await findCourseByCourseCode(body.courseCode);
 
-    if (body.courseCode !== course.courseCode || exist)
+    if (body.courseCode !== course.courseCode && exist)
       return reply.code(409).send({
         success: false,
         message: "A course with this course code already exist",
