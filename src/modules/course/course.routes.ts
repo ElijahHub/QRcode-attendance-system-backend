@@ -1,10 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { RouteConfig } from "../../types";
 import {
-  addLecturerToCourseHandler,
   createCourseHandler,
   deleteCourseHandler,
-  deleteLecturerFromCourseHandler,
   getAllCourseHandler,
   getSpecificCourse,
   updateCourseDetailsHandler,
@@ -15,7 +13,6 @@ import {
   createCourse,
   otherResponse,
 } from "./course.schema";
-import { prependListener } from "process";
 
 const courseRoutes: RouteConfig[] = [
   {
@@ -36,30 +33,6 @@ const courseRoutes: RouteConfig[] = [
     handler: updateCourseDetailsHandler,
     schema: {
       body: updateCourseDetails,
-      response: {
-        201: updateCourseDetails,
-      },
-    },
-    preHandler: true,
-  },
-
-  {
-    method: "patch",
-    url: "/update/:id/addLecturer",
-    handler: addLecturerToCourseHandler,
-    schema: {
-      response: {
-        201: updateCourseDetails,
-      },
-    },
-    preHandler: true,
-  },
-
-  {
-    method: "patch",
-    url: "/:id/removeLecturer",
-    handler: deleteLecturerFromCourseHandler,
-    schema: {
       response: {
         201: updateCourseDetails,
       },
