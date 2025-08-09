@@ -55,21 +55,25 @@ async function loginUser({ identifier, password, type, reply }: LoginType) {
   }
 
   //? ACCESS TOKEN REGISTRATION
-  const accessToken = await reply.jwtSign({
-    _id: user.id,
-    email: decrypt(user.email),
-    name: decrypt(user.name),
-    matNumber: user.matNumber ? decrypt(user.matNumber) : "",
-    role: user.role,
-  });
+  const accessToken = await reply.jwtSign(
+    {
+      _id: user.id,
+      email: decrypt(user.email),
+      name: decrypt(user.name),
+      matNumber: user.matNumber ? decrypt(user.matNumber) : "",
+      role: user.role,
+    },
+    { expiresIn: "1h" }
+  );
 
   //? SETTING COOKIE
   reply.setCookie("accessToken", accessToken, {
     domain: COOKIE_DOMAIN,
     path: "/",
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
     sameSite: false,
+    maxAge: 1000 * 60 * 60, // 1 hour
   });
 
   return accessToken;

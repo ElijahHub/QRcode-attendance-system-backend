@@ -5,48 +5,32 @@ import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 export async function createCourse(input: CreateCourseInput) {
   const { courseCode, lecturerIds, ...rest } = input;
 
-  return await prisma.$transaction(async (tx) => {
-    // Duplicate check
-    const existing = await tx.course.findUnique({
-      where: { courseCode: _.toUpper(courseCode) },
-    });
-    if (existing) {
-      throw new Error("DUPLICATE_COURSE");
-    }
-
-    // Optional: verify lecturers exist
-    const lecturersExist = await tx.user.findMany({
-      where: { id: { in: lecturerIds } },
-      select: { id: true },
-    });
-
-    if (lecturersExist.length !== lecturerIds.length) {
-      throw new Error("INVALID_LECTURERS");
-    }
-
-    // Create course
-    return tx.course.create({
-      data: {
-        courseCode: _.toUpper(courseCode),
-        ...rest,
-        lecturers: {
-          connect: lecturerIds.map((id) => ({ id })),
-        },
+  return await prisma.course.create({
+    data: {
+      courseCode: _.toUpper(courseCode),
+      ...rest,
+      lecturers: {
+        connect: lecturerIds.map((id) => ({ id })),
       },
-      include: { lecturers: true },
-    });
+    },
+    include: {
+      lecturers: true,
+    },
   });
 }
 
 export async function updateCourseDetails(
   courseId: string,
-  input: UpdateCourseDetails
+  input: UpdateCourseDetails & { lecturerIds: string[] }
 ) {
-  const { courseCode, ...rest } = input;
+  const { courseCode, lecturerIds, ...rest } = input;
   return await prisma.course.update({
     where: { id: courseId },
     data: {
       courseCode: _.toUpper(courseCode),
+      lecturers: {
+        connect: lecturerIds.map((id) => ({ id })),
+      },
       ...rest,
     },
     select: {
