@@ -9,7 +9,7 @@ const courseCore = {
 
 const createCourseSchema = z.object({
   ...courseCore,
-  lecturerIds: z.array(z.string()),
+  lecturersId: z.array(z.string()),
 });
 
 const createCourseResponseSchema = z.object({

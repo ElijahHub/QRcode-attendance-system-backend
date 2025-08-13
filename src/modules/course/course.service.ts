@@ -3,14 +3,14 @@ import prisma from "../../utils/prisma";
 import { CreateCourseInput, UpdateCourseDetails } from "./course.schema";
 
 export async function createCourse(input: CreateCourseInput) {
-  const { courseCode, lecturerIds, ...rest } = input;
+  const { courseCode, lecturersId, ...rest } = input;
 
   return await prisma.course.create({
     data: {
       courseCode: _.toUpper(courseCode),
       ...rest,
       lecturers: {
-        connect: lecturerIds.map((id) => ({ id })),
+        connect: lecturersId.map((id) => ({ id })),
       },
     },
     include: {
