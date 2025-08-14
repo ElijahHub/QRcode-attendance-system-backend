@@ -21,15 +21,15 @@ export async function createCourse(input: CreateCourseInput) {
 
 export async function updateCourseDetails(
   courseId: string,
-  input: UpdateCourseDetails & { lecturerIds: string[] }
+  input: UpdateCourseDetails & { lecturersId: string[] }
 ) {
-  const { courseCode, lecturerIds, ...rest } = input;
+  const { courseCode, lecturersId, ...rest } = input;
   return await prisma.course.update({
     where: { id: courseId },
     data: {
       courseCode: _.toUpper(courseCode),
       lecturers: {
-        connect: lecturerIds.map((id) => ({ id })),
+        connect: lecturersId.map((id) => ({ id })),
       },
       ...rest,
     },

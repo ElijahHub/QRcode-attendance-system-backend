@@ -47,7 +47,7 @@ export async function createCourseHandler(
 // Update course details
 export async function updateCourseDetailsHandler(
   req: FastifyRequest<{
-    Body: UpdateCourseDetails & { lecturerIds: string[] };
+    Body: UpdateCourseDetails & { lecturersId: string[] };
     Params: { id: string };
   }>,
   reply: FastifyReply

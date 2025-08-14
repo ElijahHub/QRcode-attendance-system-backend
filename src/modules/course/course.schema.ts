@@ -17,7 +17,7 @@ const createCourseResponseSchema = z.object({
   data: z.object({
     id: z.string(),
     ...courseCore,
-    lecturerIds: z.array(z.string()),
+    lecturersId: z.array(z.string()),
   }),
 });
 
