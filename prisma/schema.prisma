@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -37,7 +37,7 @@ model Course {
   id String @id @default(uuid())
   courseCode String @unique 
   courseName String @unique
-  description String? @db.VarChar(500)
+  description String? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
