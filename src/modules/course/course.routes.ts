@@ -20,6 +20,7 @@ const courseRoutes: RouteConfig[] = [
     url: "/",
     handler: createCourseHandler,
     schema: {
+      body: createCourse,
       response: {
         201: createCourseResponse,
       },
